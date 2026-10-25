@@ -945,6 +945,20 @@
   render(item);
   showFiche();
 
+  const invoiceBtn = document.getElementById("btnInvoice");
+  if (invoiceBtn && window.DevisFactures) {
+    const owner = store.currentArtisan();
+    const invoices = window.DevisFactures.forLead(owner ? owner.id : "local", item.id);
+    const issued = invoices.find((f) => f.status !== "brouillon");
+    if (issued) {
+      invoiceBtn.href = "factures.html?id=" + encodeURIComponent(issued.id);
+      invoiceBtn.textContent = "Voir la facture " + issued.number;
+    } else {
+      invoiceBtn.href = "factures.html?from=" + encodeURIComponent(item.id);
+      invoiceBtn.textContent = invoices.length ? "Reprendre la facture" : "Facturer cette demande";
+    }
+  }
+
   store.subscribe(async () => {
     const next = store.get(id);
     if (!next || next.hiddenAt) {

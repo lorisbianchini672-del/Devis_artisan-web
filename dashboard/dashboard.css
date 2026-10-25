@@ -692,3 +692,127 @@ body.dash {
   .bulk-tools select,
   .bulk-hide { flex: 1; }
 }
+
+/* ============================================================
+   Factures (moteur PayFlow intégré)
+   ============================================================ */
+.btn-danger { background: var(--danger-bg); color: var(--danger); }
+.btn-navy { background: var(--navy); color: var(--gold); }
+.stat-alert b { color: var(--danger); }
+.fac-tip { font-size: 0.82rem; color: var(--muted); margin: 0 0 12px; }
+.fac-panel { min-height: 0; }
+.fac-table td.num, .fac-table th.num,
+.fac-lines td.num, .fac-lines th.num { text-align: right; white-space: nowrap; }
+.fac-table tbody tr { cursor: pointer; }
+.fac-table tbody tr:hover td { background: #FBF6EC; }
+.fac-num { white-space: nowrap; font-weight: 700; font-variant-numeric: tabular-nums; }
+.fac-num.is-draft { color: var(--muted); font-weight: 600; font-style: italic; }
+.fac-client small { display: block; color: var(--muted); font-size: 0.75rem; }
+.fac-late { display: block; color: var(--danger); font-size: 0.72rem; font-weight: 700; margin-top: 3px; }
+.fac-editor { padding: 22px; min-height: 0; }
+.fac-editor-head {
+  display: flex; flex-wrap: wrap; gap: 12px;
+  align-items: flex-start; justify-content: space-between;
+  margin-bottom: 18px;
+}
+.fac-editor-head h2 { font-size: 1.25rem; letter-spacing: -0.03em; }
+.fac-kicker {
+  font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--gold-deep); margin-bottom: 4px;
+}
+.fac-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+.fac-box { border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px 16px; min-width: 0; }
+.fac-box legend { font-size: 0.78rem; font-weight: 700; padding: 0 6px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+.fac-editor .lab { display: block; font-size: 0.8rem; font-weight: 600; margin: 10px 0 6px; }
+.fac-editor input[type="text"], .fac-editor input[type="email"], .fac-editor input[type="tel"],
+.fac-editor input[type="date"], .fac-editor input[type="number"], .fac-editor select, .fac-editor textarea {
+  width: 100%;
+  border: 1.5px solid var(--line);
+  background: #fff;
+  border-radius: 10px;
+  padding: 9px 11px;
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+.fac-editor textarea { resize: vertical; line-height: 1.4; }
+.fac-editor input:focus, .fac-editor select:focus, .fac-editor textarea:focus {
+  outline: none; border-color: var(--gold-deep); box-shadow: 0 0 0 3px rgba(244, 196, 48, 0.25);
+}
+.fac-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.fac-h3 { font-size: 0.95rem; margin: 4px 0 8px; }
+.fac-lines td { padding: 6px; }
+.fac-lines .l-label { min-width: 220px; }
+.fac-lines .l-label input + input { margin-top: 6px; font-size: 0.8rem; color: var(--muted); }
+.fac-lines .l-qty { width: 80px; }
+.fac-lines .l-unit { width: 120px; }
+.fac-lines input.num { text-align: right; }
+.fac-lines .l-total { padding-top: 15px; font-weight: 700; }
+.l-del {
+  border: 0; background: none; color: var(--muted); cursor: pointer;
+  font-size: 1.1rem; padding: 8px; border-radius: 8px;
+}
+.l-del:hover { background: var(--danger-bg); color: var(--danger); }
+.fac-add { margin: 10px 0 18px; }
+.fac-bottom { display: grid; grid-template-columns: 1fr 300px; gap: 18px; align-items: start; }
+.fac-totals {
+  display: grid; grid-template-columns: 1fr auto; gap: 6px 14px;
+  background: var(--paper); border-radius: 14px; padding: 14px 16px; font-size: 0.9rem;
+}
+.fac-totals dt { color: var(--muted); }
+.fac-totals dd { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+.fac-totals .is-strong { font-size: 1.05rem; font-weight: 700; color: var(--ink); border-top: 1px solid var(--line); padding-top: 8px; }
+.fac-editor .error {
+  background: var(--danger-bg); color: var(--danger);
+  border-radius: 10px; padding: 10px 12px; font-size: 0.85rem; margin: 14px 0 0;
+}
+.fac-editor .ok-msg { margin: 14px 0 0; }
+.fac-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+.fac-actions #edDelete { margin-right: auto; }
+.fac-reminder {
+  background: var(--danger-bg); color: var(--danger);
+  border-radius: 12px; padding: 12px 14px; font-size: 0.88rem; font-weight: 600;
+}
+.fac-sheet-wrap { margin-top: 18px; background: #E8E2D4; border-radius: 14px; padding: 18px; overflow-x: auto; }
+
+/* Feuille de facture (aperçu + impression) */
+.fac-sheet {
+  background: #fff; color: #111; max-width: 780px; margin: 0 auto;
+  padding: 40px 44px; border-radius: 6px; font-size: 13px; line-height: 1.45;
+  box-shadow: 0 10px 30px rgba(13, 27, 46, 0.12);
+}
+.fs-head { display: flex; justify-content: space-between; gap: 24px; margin-bottom: 28px; }
+.fs-brand { display: flex; gap: 10px; align-items: flex-start; }
+.fs-brand strong { font-size: 16px; display: block; }
+.fs-meta { text-align: right; }
+.fs-meta h2 { font-size: 22px; letter-spacing: -0.02em; margin-bottom: 4px; }
+.fs-muted { color: #5B6A7A; }
+.fs-parties { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 22px; }
+.fs-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: #5B6A7A; font-weight: 700; margin-bottom: 4px; }
+.fs-object { margin-bottom: 14px; font-weight: 600; }
+.fs-table { width: 100%; border-collapse: collapse; margin-bottom: 18px; }
+.fs-table th { text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: #5B6A7A; border-bottom: 2px solid #0D1B2E; padding: 6px 8px; }
+.fs-table td { border-bottom: 1px solid #E2D9C8; padding: 8px; vertical-align: top; }
+.fs-table .num { text-align: right; white-space: nowrap; }
+.fs-table small { color: #5B6A7A; display: block; }
+.fs-totals { margin-left: auto; width: 280px; display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; }
+.fs-totals dd { text-align: right; font-variant-numeric: tabular-nums; }
+.fs-totals .is-strong { font-weight: 700; font-size: 15px; border-top: 2px solid #0D1B2E; padding-top: 6px; }
+.fs-pay { margin-top: 22px; padding: 12px 14px; background: #F3EEE4; border-radius: 6px; white-space: pre-line; }
+.fs-legal { margin-top: 22px; font-size: 10.5px; color: #5B6A7A; }
+.fac-print { display: none; }
+
+@media (max-width: 900px) {
+  .fac-grid, .fac-row, .fac-bottom { grid-template-columns: 1fr; }
+  .fac-sheet { padding: 24px 20px; }
+  .fs-head, .fs-parties { grid-template-columns: 1fr; display: grid; }
+  .fs-meta { text-align: left; }
+}
+
+@media print {
+  body.dash { background: #fff; }
+  body.dash.printing .app { display: none; }
+  body.dash.printing .fac-print { display: block; }
+  .fac-print .fac-sheet { box-shadow: none; padding: 0; max-width: none; }
+  @page { margin: 16mm; }
+}
+.fac-editor [hidden], #viewList[hidden], .fac-editor[hidden], .top [hidden] { display: none !important; }

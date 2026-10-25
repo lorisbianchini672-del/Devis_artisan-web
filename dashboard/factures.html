@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Factures</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <link rel="stylesheet" href="dashboard.css" />
+</head>
+<body class="dash">
+  <div class="app">
+    <aside class="side">
+      <div class="side-brand">
+        <div class="bolt" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h7l-1 8 10-14h-7l0-6z"/></svg>
+        </div>
+        <div>
+          <strong id="brandName">Espace artisan</strong>
+          <span id="brandMetier">Artisan</span>
+        </div>
+      </div>
+      <nav class="nav-side">
+        <a href="index.html">Demandes</a>
+        <a class="is-on" href="factures.html">Factures</a>
+        <a href="tarifs.html">Former l’IA</a>
+        <a id="linkPage" href="../page/index.html">Ma page</a>
+        <a id="linkWidget" href="../widget/index.html">Voir le widget</a>
+      </nav>
+      <div class="side-foot">
+        <span>Factures enregistrées dans ce navigateur.</span>
+        <button type="button" id="logout">Se déconnecter</button>
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="top">
+        <h1 id="topTitle">Factures</h1>
+        <div class="filters" id="facFilters">
+          <button type="button" class="filter is-on" data-filter="tous">Toutes</button>
+          <button type="button" class="filter" data-filter="brouillon">Brouillons</button>
+          <button type="button" class="filter" data-filter="envoyee">Envoyées</button>
+          <button type="button" class="filter" data-filter="retard">En retard</button>
+          <button type="button" class="filter" data-filter="payee">Payées</button>
+        </div>
+        <button type="button" class="btn btn-ghost" id="btnSettings">Mes infos</button>
+        <button type="button" class="btn btn-gold" id="btnNew">Nouvelle facture</button>
+      </header>
+
+      <div class="content">
+        <!-- Liste -->
+        <div id="viewList">
+          <section class="stats">
+            <article class="stat"><b id="kpiDue">0,00 €</b><span>À encaisser</span></article>
+            <article class="stat stat-alert"><b id="kpiLate">0,00 €</b><span id="kpiLateLabel">En retard</span></article>
+            <article class="stat"><b id="kpiPaid">0,00 €</b><span>Encaissé</span></article>
+          </section>
+          <p class="fac-tip" id="fromLeadTip">Astuce : ouvrez une demande puis « Facturer cette demande » pour reprendre le client et les prestations de l’estimation.</p>
+          <section class="panel fac-panel">
+            <div class="price-scroll">
+              <table class="price-table fac-table">
+                <thead>
+                  <tr>
+                    <th>N°</th>
+                    <th>Client</th>
+                    <th>Émise le</th>
+                    <th>Échéance</th>
+                    <th class="num">Total TTC</th>
+                    <th>Statut</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="facBody"></tbody>
+              </table>
+            </div>
+            <p class="empty" id="facEmpty" hidden>Aucune facture pour l’instant. Créez-en une, ou facturez une demande depuis sa fiche.</p>
+          </section>
+        </div>
+
+        <!-- Éditeur -->
+        <form class="panel fac-editor" id="viewEditor" hidden novalidate>
+          <div class="fac-editor-head">
+            <div>
+              <p class="fac-kicker" id="edKicker">Brouillon</p>
+              <h2 id="edTitle">Nouvelle facture</h2>
+              <p class="tarif-help" id="edLead" hidden></p>
+            </div>
+            <button type="button" class="btn btn-ghost" id="edClose">← Retour à la liste</button>
+          </div>
+
+          <div class="fac-grid">
+            <fieldset class="fac-box">
+              <legend>Client</legend>
+              <label class="lab" for="cName">Nom</label>
+              <input id="cName" type="text" autocomplete="off" placeholder="Camille Martin" />
+              <label class="lab" for="cAddress">Adresse</label>
+              <input id="cAddress" type="text" autocomplete="off" placeholder="14 rue de la Part-Dieu, Lyon" />
+              <div class="fac-row">
+                <div>
+                  <label class="lab" for="cCp">Code postal</label>
+                  <input id="cCp" type="text" inputmode="numeric" maxlength="5" />
+                </div>
+                <div>
+                  <label class="lab" for="cEmail">E-mail</label>
+                  <input id="cEmail" type="email" />
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="fac-box">
+              <legend>Facture</legend>
+              <label class="lab" for="fObject">Objet</label>
+              <input id="fObject" type="text" placeholder="Remplacement du tableau électrique" />
+              <div class="fac-row">
+                <div>
+                  <label class="lab" for="fIssue">Émise le</label>
+                  <input id="fIssue" type="date" />
+                </div>
+                <div>
+                  <label class="lab" for="fDue">Échéance</label>
+                  <input id="fDue" type="date" />
+                </div>
+              </div>
+              <div class="fac-row">
+                <div>
+                  <label class="lab" for="fTva">TVA</label>
+                  <select id="fTva">
+                    <option value="0.2">20 %</option>
+                    <option value="0.1">10 % (rénovation logement)</option>
+                    <option value="0.055">5,5 % (rénovation énergétique)</option>
+                    <option value="0">0 % (franchise art. 293 B)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="lab" for="fAcompte">Acompte déjà reçu (TTC)</label>
+                  <input id="fAcompte" type="text" inputmode="decimal" placeholder="0" />
+                </div>
+              </div>
+            </fieldset>
+          </div>
+
+          <h3 class="fac-h3">Prestations</h3>
+          <div class="price-scroll">
+            <table class="price-table fac-lines">
+              <thead>
+                <tr>
+                  <th>Libellé</th>
+                  <th class="num">Qté</th>
+                  <th class="num">PU HT</th>
+                  <th class="num">Total HT</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="lineBody"></tbody>
+            </table>
+          </div>
+          <button type="button" class="btn btn-ghost fac-add" id="addLine">+ Ajouter une ligne</button>
+
+          <div class="fac-bottom">
+            <div>
+              <label class="lab" for="fNotes">Note sur la facture (facultatif)</label>
+              <textarea id="fNotes" rows="3" placeholder="Merci pour votre confiance."></textarea>
+            </div>
+            <dl class="fac-totals" id="edTotals"></dl>
+          </div>
+
+          <p class="error" id="edError" hidden></p>
+          <div class="fac-actions">
+            <button type="button" class="btn btn-danger" id="edDelete" hidden>Supprimer le brouillon</button>
+            <button type="button" class="btn btn-ghost" id="edPreview">Aperçu / PDF</button>
+            <button type="button" class="btn btn-ghost" id="edSave">Enregistrer le brouillon</button>
+            <button type="button" class="btn btn-gold" id="edValidate">Valider et numéroter</button>
+          </div>
+          <p class="tarif-help">Une fois validée, la facture reçoit son numéro définitif et ne peut plus être modifiée ni supprimée, comme l’exige la loi.</p>
+        </form>
+
+        <!-- Détail d'une facture validée -->
+        <section class="panel fac-editor" id="viewDetail" hidden>
+          <div class="fac-editor-head">
+            <div>
+              <p class="fac-kicker" id="dtKicker"></p>
+              <h2 id="dtTitle"></h2>
+              <p class="tarif-help" id="dtMeta"></p>
+            </div>
+            <button type="button" class="btn btn-ghost" id="dtClose">← Retour à la liste</button>
+          </div>
+          <div class="fac-reminder" id="dtReminder" hidden></div>
+          <div class="fac-actions">
+            <button type="button" class="btn btn-ghost" id="dtPrint">Aperçu / PDF</button>
+            <button type="button" class="btn btn-ghost" id="dtMail">Envoyer par e-mail</button>
+            <button type="button" class="btn btn-ghost" id="dtRemind" hidden>Relancer le client</button>
+            <button type="button" class="btn btn-gold" id="dtPaid">Marquer comme payée</button>
+          </div>
+          <div class="fac-sheet-wrap" id="dtSheet"></div>
+        </section>
+
+        <!-- Paramètres -->
+        <form class="panel fac-editor" id="viewSettings" hidden novalidate>
+          <div class="fac-editor-head">
+            <div>
+              <p class="fac-kicker">Repris sur chaque facture</p>
+              <h2>Mes informations de facturation</h2>
+            </div>
+            <button type="button" class="btn btn-ghost" id="stClose">← Retour à la liste</button>
+          </div>
+          <div class="fac-grid">
+            <fieldset class="fac-box">
+              <legend>Entreprise</legend>
+              <label class="lab" for="sName">Nom ou raison sociale</label>
+              <input id="sName" type="text" />
+              <label class="lab" for="sSiret">SIRET</label>
+              <input id="sSiret" type="text" inputmode="numeric" maxlength="17" placeholder="123 456 789 00012" />
+              <label class="lab" for="sAddress">Adresse</label>
+              <input id="sAddress" type="text" />
+              <div class="fac-row">
+                <div>
+                  <label class="lab" for="sEmail">E-mail</label>
+                  <input id="sEmail" type="email" />
+                </div>
+                <div>
+                  <label class="lab" for="sPhone">Téléphone</label>
+                  <input id="sPhone" type="tel" />
+                </div>
+              </div>
+            </fieldset>
+            <fieldset class="fac-box">
+              <legend>TVA et paiement</legend>
+              <label class="lab" for="sTvaNum">N° de TVA intracommunautaire</label>
+              <input id="sTvaNum" type="text" placeholder="FR12 345678901" />
+              <label class="tarif-check" for="sFranchise">
+                <input id="sFranchise" type="checkbox" />
+                <span>Je suis en franchise de TVA (micro-entreprise)</span>
+              </label>
+              <label class="lab" for="sDays">Délai de paiement (jours)</label>
+              <input id="sDays" type="number" min="0" max="60" step="1" />
+              <label class="lab" for="sPay">Comment vous payer</label>
+              <textarea id="sPay" rows="3" placeholder="Virement : IBAN FR76 …  ou lien de paiement"></textarea>
+            </fieldset>
+          </div>
+          <p class="error" id="stError" hidden></p>
+          <p class="ok-msg" id="stOk" hidden>Informations enregistrées.</p>
+          <div class="fac-actions">
+            <button type="button" class="btn btn-gold" id="stSave">Enregistrer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feuille imprimable (Aperçu / PDF) -->
+  <div class="fac-print" id="printArea" aria-hidden="true"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="../shared/supabase-config.js"></script>
+  <script src="../shared/store.js"></script>
+  <script src="../shared/factures.js"></script>
+  <script src="factures.js"></script>
+</body>
+</html>
