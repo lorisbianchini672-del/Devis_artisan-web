@@ -1343,3 +1343,126 @@ body.is-embed .foot { display: none; }
 @media (prefers-reduced-motion: reduce) {
   .step.is-active, .step.is-back, .track span, .choice, .landing-spin { animation: none; transition: none; }
 }
+
+/* ============================================================
+   Esthétique (refonte légère) — lisibilité, hiérarchie, viseur
+   Bloc ajouté en fin de fichier : ne modifie aucune règle plus haut.
+   ============================================================ */
+
+/* Focus clavier visible partout */
+body.widget :focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: 10px;
+}
+
+.field textarea:focus,
+.field input:focus {
+  outline: none;
+  border-color: var(--gold-deep);
+  box-shadow: 0 0 0 3px rgba(244, 196, 48, 0.28);
+}
+
+/* Étapes : texte normal, plus lisible, point sur l'étape en cours */
+.steps-dots li {
+  font-size: 0.8rem;
+  letter-spacing: 0;
+  text-transform: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.steps-dots li::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--line);
+  flex-shrink: 0;
+}
+
+.steps-dots li.is-done::before { background: var(--navy); }
+.steps-dots li.is-current::before { background: var(--gold); box-shadow: 0 0 0 3px rgba(244, 196, 48, 0.25); }
+
+.shot-kicker {
+  font-size: 0.85rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.shot-badge {
+  letter-spacing: 0;
+  text-transform: none;
+  font-size: 0.75rem;
+}
+
+/* Zone photo : un viseur d'appareil photo indique quoi cadrer */
+.shot-stage {
+  background: radial-gradient(120% 90% at 50% 40%, #1A2C42 0%, #0D1B2E 70%);
+  border: 0;
+  box-shadow: inset 0 0 0 1px rgba(247, 241, 228, 0.08);
+}
+
+.shot-placeholder::before {
+  content: "";
+  position: absolute;
+  inset: 18px;
+  pointer-events: none;
+  --c: rgba(244, 196, 48, 0.85);
+  --l: 26px;
+  background:
+    linear-gradient(var(--c), var(--c)) top left / var(--l) 2px,
+    linear-gradient(var(--c), var(--c)) top left / 2px var(--l),
+    linear-gradient(var(--c), var(--c)) top right / var(--l) 2px,
+    linear-gradient(var(--c), var(--c)) top right / 2px var(--l),
+    linear-gradient(var(--c), var(--c)) bottom left / var(--l) 2px,
+    linear-gradient(var(--c), var(--c)) bottom left / 2px var(--l),
+    linear-gradient(var(--c), var(--c)) bottom right / var(--l) 2px,
+    linear-gradient(var(--c), var(--c)) bottom right / 2px var(--l);
+  background-repeat: no-repeat;
+}
+
+.shot-placeholder p { color: rgba(247, 241, 228, 0.9); }
+
+/* Boutons photo : l'action principale d'abord, les alternatives en discret */
+.shot-actions .btn-navy,
+.shot-actions .btn-back:not(.btn-offer-video):not(.btn-skip-shot) {
+  min-height: 52px;
+}
+
+.btn-offer-video,
+.btn-skip-shot {
+  grid-column: auto;
+  background: transparent;
+  border: 0;
+  min-height: 0;
+  padding: 10px 6px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--navy);
+  text-decoration: underline;
+  text-decoration-color: rgba(13, 27, 46, 0.25);
+  text-underline-offset: 4px;
+}
+
+.btn-offer-video:hover,
+.btn-skip-shot:hover { text-decoration-color: var(--gold-deep); }
+
+.btn-skip-shot { color: var(--muted); }
+
+/* Bouton principal : un peu plus présent */
+.btn-next {
+  min-height: 52px;
+  box-shadow: 0 6px 18px rgba(201, 162, 39, 0.28);
+}
+
+/* En-tête sur téléphone : le badge passe sous le titre */
+@media (max-width: 480px) {
+  .brand { flex-wrap: wrap; padding: 16px 18px; }
+  .brand h1 { font-size: 1rem; }
+  .trust { font-size: 0.7rem; }
+  .progress-wrap { padding-left: 18px; padding-right: 18px; }
+  .viewport { padding-left: 18px; padding-right: 18px; }
+  .steps-dots li { font-size: 0.74rem; gap: 5px; }
+}
