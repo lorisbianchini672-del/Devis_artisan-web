@@ -1,0 +1,55 @@
+/* Page Abonnement — mêmes couleurs que l'espace artisan */
+.ab-page { max-width: 980px; }
+.ab-page [hidden] { display: none !important; }
+
+.ab-flash {
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 14px;
+  background: #FFF3C4;
+  color: #7A5B00;
+}
+.ab-flash.ab-ok { background: var(--ok-bg); color: var(--ok); }
+.ab-flash.ab-err { background: var(--danger-bg); color: var(--danger); }
+
+.ab-status {
+  min-height: 0;
+  padding: 20px 22px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  border-left: 5px solid var(--line);
+}
+.ab-status.is-active { border-left-color: var(--ok); }
+.ab-label { font-size: 0.8rem; color: var(--muted); font-weight: 600; margin-bottom: 2px; }
+.ab-status h2 { font-size: 1.3rem; letter-spacing: -0.03em; }
+.ab-sub { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
+
+.ab-plans {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.ab-plan {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ab-plan.is-mine { border: 2px solid var(--gold); }
+.ab-plan h3 { font-size: 1.15rem; letter-spacing: -0.02em; }
+.ab-price strong { font-size: 2rem; letter-spacing: -0.05em; }
+.ab-price span { color: var(--muted); font-size: 0.88rem; }
+.ab-desc { color: var(--muted); line-height: 1.5; font-size: 0.92rem; }
+.ab-plan .btn { margin-top: auto; justify-content: center; min-height: 46px; }
+.ab-mine { margin-top: auto; font-weight: 700; color: var(--gold-deep); }
+.ab-empty, .ab-note { color: var(--muted); font-size: 0.85rem; line-height: 1.5; max-width: 70ch; }

@@ -12,3 +12,13 @@ verify_jwt = false
 [functions.extract-quote]
 enabled = true
 verify_jwt = false
+
+# Abonnement Stripe : la fonction vérifie elle-même la connexion de l'artisan.
+[functions.billing]
+enabled = true
+verify_jwt = false
+
+# Stripe appelle ce webhook sans jeton Supabase : la signature Stripe est vérifiée dans le code.
+[functions.stripe-webhook]
+enabled = true
+verify_jwt = false

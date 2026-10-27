@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Abonnement</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <link rel="stylesheet" href="dashboard.css" />
+  <link rel="stylesheet" href="abonnement.css" />
+</head>
+<body class="dash">
+  <div class="app">
+    <aside class="side">
+      <div class="side-brand">
+        <div class="bolt" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h7l-1 8 10-14h-7l0-6z"/></svg>
+        </div>
+        <div>
+          <strong id="brandName">Espace artisan</strong>
+          <span id="brandMetier">Artisan</span>
+        </div>
+      </div>
+      <nav class="nav-side">
+        <a href="index.html">Tableau de bord</a>
+        <a href="paiements.html">Paiements</a>
+        <a class="is-on" href="abonnement.html">Abonnement</a>
+      </nav>
+      <div class="side-foot">
+        <a id="linkWidget" href="../widget/index.html">Voir le widget</a>
+        <button type="button" id="logout">Se déconnecter</button>
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="top">
+        <h1>Abonnement</h1>
+      </header>
+      <div class="content ab-page">
+        <p class="ab-flash ab-ok" id="flashOk" hidden>Merci, votre paiement est confirmé. Votre abonnement est actif dès que Stripe nous le confirme (quelques secondes).</p>
+        <p class="ab-flash" id="flashCancel" hidden>Paiement annulé : rien n’a été débité. Vous pouvez choisir une offre quand vous voulez.</p>
+        <p class="ab-flash ab-err" id="abError" hidden></p>
+
+        <section class="panel ab-status" id="statusPanel">
+          <div>
+            <p class="ab-label">Votre abonnement</p>
+            <h2 id="stTitle">Chargement…</h2>
+            <p class="ab-sub" id="stSub"></p>
+          </div>
+          <button type="button" class="btn btn-ghost" id="btnPortal" hidden>Gérer mon abonnement</button>
+        </section>
+
+        <section class="ab-plans" id="plans" aria-label="Offres"></section>
+
+        <p class="ab-note">Paiement sécurisé par Stripe. Sans engagement : vous résiliez quand vous voulez depuis « Gérer mon abonnement », l’accès reste ouvert jusqu’à la fin de la période payée. Factures téléchargeables au même endroit.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="../shared/supabase-config.js"></script>
+  <script src="../shared/store.js"></script>
+  <script src="../shared/billing.js"></script>
+  <script src="abonnement.js"></script>
+</body>
+</html>
