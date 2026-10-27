@@ -12,3 +12,9 @@ verify_jwt = false
 [functions.extract-quote]
 enabled = true
 verify_jwt = false
+
+# Relances de paiement (IA + envoi automatique). La fonction vérifie elle-même
+# la connexion de l'artisan, ou le secret de la tâche planifiée.
+[functions.payment-reminders]
+enabled = true
+verify_jwt = false

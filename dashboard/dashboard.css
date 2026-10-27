@@ -811,3 +811,23 @@ textarea.pf-input { resize: vertical; line-height: 1.5; }
 .pf-method .pf-input { margin: 8px 0 0; }
 .pf-method .pf-input[hidden] { display: none; }
 select.pf-input { appearance: auto; }
+
+/* Envoi automatique des relances (onglet Paiements) */
+.pf-auto { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: center; justify-content: space-between; border-left: 4px solid var(--line); }
+.pf-auto.is-on { border-left-color: var(--ok); }
+.pf-auto-text { flex: 1 1 420px; min-width: 0; }
+.pf-auto-text .tarif-help { margin: 0; max-width: 70ch; }
+.pf-auto .error, .pf-auto .ok-msg { margin: 10px 0 0; }
+.pf-auto .error { background: var(--danger-bg); color: var(--danger); border-radius: 10px; padding: 10px 12px; font-size: 0.85rem; }
+.pf-auto-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+.pf-switch { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 700; font-size: 0.9rem; }
+.pf-switch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.pf-switch-ui { width: 44px; height: 26px; border-radius: 999px; background: #D8CFBC; position: relative; transition: background 0.2s; flex-shrink: 0; }
+.pf-switch-ui::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.2); transition: transform 0.2s; }
+.pf-switch input:checked + .pf-switch-ui { background: var(--ok); }
+.pf-switch input:checked + .pf-switch-ui::after { transform: translateX(18px); }
+.pf-switch input:focus-visible + .pf-switch-ui { outline: 3px solid var(--gold); outline-offset: 2px; }
+.pf-switch input:disabled + .pf-switch-ui { opacity: 0.5; }
+.pf-ai-row { display: flex; align-items: center; gap: 10px; margin: 2px 0 10px; }
+.pf-ai-row .tarif-help { margin: 0; }
+@media (max-width: 700px) { .pf-auto-actions { align-items: flex-start; } }

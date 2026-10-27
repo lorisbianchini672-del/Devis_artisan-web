@@ -301,8 +301,27 @@
     f("remSubject").value = msg.subject;
     f("remBody").value = msg.body;
     f("remSend").hidden = !inv.email;
+    f("remAiNote").textContent = "";
     remModal.showModal();
   }
+  f("remAi").addEventListener("click", async () => {
+    if (!reminding) return;
+    const btn = f("remAi");
+    btn.disabled = true;
+    f("remAiNote").textContent = "Rédaction en cours…";
+    try {
+      const msg = await window.DevisRelances.draft(reminding.inv.id);
+      f("remSubject").value = msg.subject;
+      f("remBody").value = msg.body;
+      f("remAiNote").textContent = msg.ai
+        ? "Texte rédigé par l’IA : relisez-le avant l’envoi."
+        : "L’IA n’a pas pu rédiger : modèle standard proposé.";
+    } catch (err) {
+      f("remAiNote").textContent = (err && err.message) || "Rédaction impossible.";
+    } finally {
+      btn.disabled = false;
+    }
+  });
   function logReminder(channel) {
     const { inv, idx } = reminding;
     inv.reminders = inv.reminders || [];
@@ -450,8 +469,73 @@
     render();
   });
 
+  // ---------- Envoi automatique ----------
+  function renderAuto() {
+    const on = Boolean(state.settings.auto);
+    f("autoSend").checked = on;
+    f("autoLabel").textContent = on ? "Activé" : "Désactivé";
+    f("autoPanel").classList.toggle("is-on", on);
+  }
+  let cloud = false;
+  (async () => {
+    try {
+      cloud = Boolean(window.DevisRelances) && (await window.DevisRelances.available());
+    } catch (e) {
+      cloud = false;
+    }
+    f("remAi").hidden = !cloud;
+    f("runNow").hidden = !cloud;
+    if (!cloud) {
+      f("autoSend").disabled = true;
+      f("autoHelp").textContent =
+        "Disponible avec le compte cloud : chaque matin, les relances prévues partent toutes seules par e-mail, rédigées par l’IA. En démo, préparez-les et envoyez-les depuis votre messagerie.";
+    }
+  })();
+  f("autoSend").addEventListener("change", () => {
+    const on = f("autoSend").checked;
+    if (on) {
+      const noEmail = state.invoices.filter((i) => !i.paidAt && !i.email).length;
+      const ok = window.confirm(
+        "Activer l’envoi automatique ?\n\nChaque matin, les relances prévues par votre scénario seront envoyées par e-mail à vos clients, sans validation de votre part." +
+          (noEmail ? `\n\n${noEmail} facture(s) sans e-mail client ne seront pas relancées automatiquement.` : "")
+      );
+      if (!ok) {
+        f("autoSend").checked = false;
+        return;
+      }
+    }
+    state.settings.auto = on;
+    save();
+    renderAuto();
+    f("autoOk").hidden = false;
+    f("autoOk").textContent = on ? "Envoi automatique activé : prochaines relances demain matin." : "Envoi automatique désactivé.";
+  });
+  f("runNow").addEventListener("click", async () => {
+    const btn = f("runNow");
+    btn.disabled = true;
+    f("autoError").hidden = true;
+    f("autoOk").hidden = true;
+    try {
+      const res = await window.DevisRelances.runNow();
+      f("autoOk").hidden = false;
+      f("autoOk").textContent =
+        (res.sent ? `${res.sent} relance(s) envoyée(s).` : "Aucune relance à envoyer aujourd’hui.") +
+        (res.skipped && res.skipped.length ? " Non envoyées : " + res.skipped.join(" ; ") + "." : "");
+      if (res.sent && store.loadPayments) {
+        state = await store.loadPayments();
+        render();
+      }
+    } catch (err) {
+      f("autoError").hidden = false;
+      f("autoError").textContent = (err && err.message) || "Envoi impossible.";
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
   renderScenario();
   renderMethods();
+  renderAuto();
   render();
   store.subscribe && store.subscribe(render);
 

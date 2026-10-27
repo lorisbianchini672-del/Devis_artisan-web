@@ -1803,6 +1803,7 @@
           link: methods.lien.on ? methods.lien.value : "",
           delay: Number(st.delay) || 30,
           methods,
+          auto: Boolean(st.auto),
         };
       })(),
     };
@@ -1828,10 +1829,10 @@
   }
 
   const METHODS_MIGRATION_NOTE =
-    "Les moyens de paiement ne sont pas encore en base. Exécutez la migration 20261027200000_payment_methods.sql dans le SQL Editor Supabase. Seuls l’IBAN et le lien sont enregistrés en attendant.";
+    "Les moyens de paiement et l’envoi automatique ne sont pas encore en base. Exécutez les migrations 20261027200000_payment_methods.sql et 20261027210000_auto_reminders.sql dans le SQL Editor Supabase. Seuls l’IBAN et le lien sont enregistrés en attendant.";
 
   function methodsColumnMissing(error) {
-    return /methods|paid_method/i.test(String((error && error.message) || ""));
+    return /methods|paid_method|auto_send/i.test(String((error && error.message) || ""));
   }
 
   function paymentTableMissing(error) {
@@ -1939,6 +1940,7 @@
         link: settingsRow.payment_link || "",
         delay: settingsRow.delay_days || 30,
         methods: settingsRow.methods || {},
+        auto: Boolean(settingsRow.auto_send),
       },
     });
     return clonePayments(paymentCache);
@@ -1960,11 +1962,13 @@
       delay_days: next.settings.delay,
       steps: next.steps,
       methods: next.settings.methods,
+      auto_send: Boolean(next.settings.auto),
       updated_at: new Date().toISOString(),
     };
     let settingsWrite = await client.from("dv_payment_settings").upsert(settingsRow, { onConflict: "artisan_id" });
     if (settingsWrite.error && methodsColumnMissing(settingsWrite.error)) {
       delete settingsRow.methods;
+      delete settingsRow.auto_send;
       lastError = METHODS_MIGRATION_NOTE;
       settingsWrite = await client.from("dv_payment_settings").upsert(settingsRow, { onConflict: "artisan_id" });
     }

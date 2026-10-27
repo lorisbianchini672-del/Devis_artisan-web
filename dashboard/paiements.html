@@ -72,6 +72,23 @@
           <div id="invList"></div>
         </section>
 
+        <section class="panel pf-auto" id="autoPanel">
+          <div class="pf-auto-text">
+            <h2>Envoi automatique des relances</h2>
+            <p class="tarif-help" id="autoHelp">Chaque matin, les relances prévues par votre scénario partent toutes seules par e-mail, rédigées par l’IA selon le client, le montant et le retard. Les réponses de vos clients arrivent dans votre boîte mail.</p>
+            <p class="error" id="autoError" hidden></p>
+            <p class="ok-msg" id="autoOk" hidden></p>
+          </div>
+          <div class="pf-auto-actions">
+            <label class="pf-switch">
+              <input type="checkbox" id="autoSend" />
+              <span class="pf-switch-ui" aria-hidden="true"></span>
+              <span id="autoLabel">Désactivé</span>
+            </label>
+            <button type="button" class="btn btn-ghost pf-sm" id="runNow" hidden>Envoyer les relances du jour</button>
+          </div>
+        </section>
+
         <div class="ia-cols">
           <section class="panel">
             <h2>Scénario de relance</h2>
@@ -139,6 +156,10 @@
       <p class="tarif-help" id="remTo"></p>
       <label class="lab" for="remSubject">Objet</label>
       <input class="pf-input" id="remSubject" />
+      <div class="pf-ai-row">
+        <button type="button" class="btn btn-ghost pf-sm" id="remAi" hidden>Rédiger avec l’IA</button>
+        <span class="tarif-help" id="remAiNote"></span>
+      </div>
       <label class="lab" for="remBody">Message</label>
       <textarea class="pf-input" id="remBody" rows="11"></textarea>
       <div class="pf-actions">
@@ -152,6 +173,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="../shared/supabase-config.js"></script>
   <script src="../shared/store.js"></script>
+  <script src="../shared/relances.js"></script>
   <script src="paiements.js"></script>
 </body>
 </html>
