@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link id="dashCss" rel="stylesheet" href="../shared/theme.css" />
   <link id="dashPageCss" rel="stylesheet" href="dashboard.css" />
+  <link rel="stylesheet" href="refonte.css" />
   <script>
     (function () {
       var path = location.pathname;
@@ -17,6 +18,8 @@
         : path.replace(/[^/]*$/, "");
       var pageCss = document.getElementById("dashPageCss");
       if (pageCss) pageCss.href = base + "dashboard.css";
+      var refonte = document.querySelector('link[href="refonte.css"]');
+      if (refonte) refonte.href = base + "refonte.css";
       document.documentElement.dataset.dashBase = base;
     })();
   </script>
