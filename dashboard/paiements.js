@@ -113,14 +113,41 @@
     return `F${year}-${String(n).padStart(3, "0")}`;
   }
 
+  // ---------- Moyens de paiement ----------
+  const METHODS = store.payMethods || [];
+  const methodLabel = (key) => {
+    const m = METHODS.find((x) => x.key === key);
+    return m ? m.label : key === "autre" ? "Autre" : "";
+  };
+  const shortLabel = (key) =>
+    ({ virement: "virement", cheque: "chèque", especes: "espèces", carte: "carte", paypal: "PayPal", wero: "Wero", lien: "lien de paiement", autre: "autre" }[key] || "");
+
+  function payLines(settings) {
+    const ms = (settings && settings.methods) || {};
+    const lines = [];
+    for (const m of METHODS) {
+      const cur = ms[m.key];
+      if (!cur || !cur.on) continue;
+      const v = (cur.value || "").trim();
+      if (m.key === "virement") lines.push(v ? `- Virement : ${v}` : "- Virement bancaire");
+      else if (m.key === "cheque") lines.push(v ? `- Chèque à l’ordre de ${v}` : "- Chèque");
+      else if (m.key === "especes") lines.push("- Espèces, lors de notre passage");
+      else if (m.key === "carte") lines.push("- Carte bancaire, lors de notre passage");
+      else if (m.key === "paypal") lines.push(v ? `- PayPal : ${v}` : "- PayPal");
+      else if (m.key === "wero") lines.push(v ? `- Wero : ${v}` : "- Wero");
+      else if (m.key === "lien" && v) lines.push(`- Paiement en ligne : ${v}`);
+    }
+    return lines.join("\n");
+  }
+
   // ---------- Message de relance ----------
   function buildMessage(inv, step) {
     const s = state.settings;
     const who = artisan.displayName || "Votre artisan";
     const late = lateDays(inv);
     const amount = eur(inv.amount);
-    const pay = [s.iban && `Virement : ${s.iban}`, s.link && `Paiement en ligne : ${s.link}`].filter(Boolean).join("\n");
-    const payBlock = pay ? `\n\n${pay}` : "";
+    const pay = payLines(s);
+    const payBlock = pay ? `\n\nPour régler, au choix :\n${pay}` : "";
     const hello = `Bonjour ${inv.client},`;
     const ref = `la facture ${inv.number}${inv.label ? " (" + inv.label + ")" : ""} d’un montant de ${amount}`;
     const tone = Number(step.tone) || 1;
@@ -158,7 +185,7 @@
         <strong>${esc(inv.client)} · ${eur(inv.amount)}</strong>
         <small>${esc(inv.number)}${inv.label ? " · " + esc(inv.label) : ""} · échéance ${dfr(inv.due)}${sent ? ` · ${sent} relance${sent > 1 ? "s" : ""}` : ""}</small>
       </div>
-      <span class="badge ${st.tone}">${st.label}</span>
+      <span class="badge ${st.tone}">${st.label}${inv.paidAt && inv.paidMethod ? " · " + esc(shortLabel(inv.paidMethod)) : ""}</span>
       <div class="pf-inv-actions">${withAction !== false ? action : ""}
         <button type="button" class="pf-icon" data-edit="${inv.id}" title="Modifier" aria-label="Modifier">✎</button>
       </div>
@@ -307,14 +334,11 @@
     if (b.dataset.remind) openReminder(find(b.dataset.remind));
     else if (b.dataset.edit) openInvoice(find(b.dataset.edit));
     else if (b.dataset.bill) billLead(b.dataset.bill);
-    else if (b.dataset.paid) {
-      const inv = find(b.dataset.paid);
-      inv.paidAt = new Date().toISOString();
-      if (inv.leadId) store.addEvent(inv.leadId, `Facture ${inv.number} payée (${eur(inv.amount)}).`, "note").catch(() => {});
-      save();
-      render();
-    } else if (b.dataset.unpay) {
-      find(b.dataset.unpay).paidAt = null;
+    else if (b.dataset.paid) openPaid(find(b.dataset.paid));
+    else if (b.dataset.unpay) {
+      const inv = find(b.dataset.unpay);
+      inv.paidAt = null;
+      inv.paidMethod = "";
       save();
       render();
     }
@@ -350,16 +374,84 @@
     render();
     f("scenarioOk").hidden = false;
   });
-  f("pIban").value = state.settings.iban;
-  f("pLink").value = state.settings.link;
+  function renderMethods() {
+    const ms = state.settings.methods || {};
+    f("pMethods").innerHTML = METHODS.map((m) => {
+      const cur = ms[m.key] || { on: false, value: "" };
+      return `<div class="pf-method${cur.on ? " is-on" : ""}" data-m="${m.key}">
+        <label class="pf-method-check"><input type="checkbox" data-mk="${m.key}" ${cur.on ? "checked" : ""} /> <span>${esc(m.label)}</span></label>
+        ${m.field ? `<input class="pf-input" data-mv="${m.key}" value="${esc(cur.value)}" placeholder="${esc(m.placeholder)}" aria-label="${esc(m.label + " : " + m.field)}" ${cur.on ? "" : "hidden"} />` : ""}
+      </div>`;
+    }).join("");
+  }
+  f("pMethods").addEventListener("change", (e) => {
+    const cb = e.target.closest("[data-mk]");
+    if (!cb) return;
+    const row = cb.closest(".pf-method");
+    row.classList.toggle("is-on", cb.checked);
+    const input = row.querySelector("[data-mv]");
+    if (input) {
+      input.hidden = !cb.checked;
+      if (cb.checked) input.focus();
+    }
+    f("settingsOk").hidden = true;
+  });
   f("pDelay").value = state.settings.delay;
   f("saveSettings").addEventListener("click", () => {
-    state.settings = { iban: f("pIban").value.trim(), link: f("pLink").value.trim(), delay: Number(f("pDelay").value) || 30 };
+    const methods = {};
+    for (const m of METHODS) {
+      const cb = f("pMethods").querySelector(`[data-mk="${m.key}"]`);
+      const input = f("pMethods").querySelector(`[data-mv="${m.key}"]`);
+      methods[m.key] = { on: Boolean(cb && cb.checked), value: input ? input.value.trim() : "" };
+    }
+    if (methods.lien.on && methods.lien.value && !/^https?:\/\//i.test(methods.lien.value)) {
+      methods.lien.value = "https://" + methods.lien.value;
+    }
+    state.settings = {
+      iban: methods.virement.on ? methods.virement.value : "",
+      link: methods.lien.on ? methods.lien.value : "",
+      delay: Number(f("pDelay").value) || 30,
+      methods,
+    };
     save();
+    renderMethods();
     f("settingsOk").hidden = false;
   });
 
+  // ---------- Facture payée : moyen et date ----------
+  let paying = null;
+  function openPaid(inv) {
+    if (!inv) return;
+    paying = inv;
+    const ms = state.settings.methods || {};
+    const accepted = METHODS.filter((m) => ms[m.key] && ms[m.key].on);
+    const list = (accepted.length ? accepted : METHODS).map((m) => `<option value="${m.key}">${esc(m.label)}</option>`);
+    list.push(`<option value="autre">Autre</option>`);
+    f("paidMethod").innerHTML = list.join("");
+    f("paidDate").value = today();
+    f("paidInfo").textContent = `${inv.client} · ${eur(inv.amount)} · facture ${inv.number}`;
+    f("paidModal").showModal();
+  }
+  f("paidCancel").addEventListener("click", () => f("paidModal").close());
+  f("paidForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (!paying) return;
+    const day = f("paidDate").value || today();
+    paying.paidAt = new Date(day + "T12:00:00").toISOString();
+    paying.paidMethod = f("paidMethod").value;
+    if (paying.leadId) {
+      store
+        .addEvent(paying.leadId, `Facture ${paying.number} payée par ${methodLabel(paying.paidMethod).toLowerCase()} (${eur(paying.amount)}).`, "note")
+        .catch(() => {});
+    }
+    f("paidModal").close();
+    paying = null;
+    save();
+    render();
+  });
+
   renderScenario();
+  renderMethods();
   render();
   store.subscribe && store.subscribe(render);
 

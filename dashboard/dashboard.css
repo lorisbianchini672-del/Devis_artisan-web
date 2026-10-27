@@ -801,3 +801,13 @@ textarea.pf-input { resize: vertical; line-height: 1.5; }
   .pf-inv-actions { grid-column: 1 / -1; justify-content: flex-start; }
   .pf-row { grid-template-columns: 1fr; }
 }
+
+/* Moyens de paiement acceptés (onglet Paiements) */
+.pf-methods { display: grid; gap: 6px; margin-bottom: 14px; }
+.pf-method { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; background: var(--card); }
+.pf-method.is-on { border-color: var(--gold-deep); background: #FFFBEE; }
+.pf-method-check { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+.pf-method-check input { width: 18px; height: 18px; accent-color: var(--navy); }
+.pf-method .pf-input { margin: 8px 0 0; }
+.pf-method .pf-input[hidden] { display: none; }
+select.pf-input { appearance: auto; }

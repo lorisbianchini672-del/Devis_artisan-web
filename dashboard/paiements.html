@@ -81,16 +81,13 @@
             <p class="ok-msg" id="scenarioOk" hidden>Scénario enregistré.</p>
           </section>
           <section class="panel">
-            <h2>Coordonnées de paiement</h2>
-            <p class="tarif-help">Ajoutées à chaque relance pour que le client paie tout de suite.</p>
-            <label class="lab" for="pIban">IBAN</label>
-            <input class="pf-input" id="pIban" placeholder="FR76 …" />
-            <label class="lab" for="pLink">Lien de paiement (facultatif)</label>
-            <input class="pf-input" id="pLink" placeholder="https://…" />
+            <h2>Moyens de paiement acceptés</h2>
+            <p class="tarif-help">Cochez ce que vos clients peuvent utiliser. Ils sont rappelés dans chaque relance, avec vos coordonnées. Aucun compte Stripe n’est nécessaire.</p>
+            <div class="pf-methods" id="pMethods"></div>
             <label class="lab" for="pDelay">Délai de paiement par défaut (jours)</label>
             <input class="pf-input" id="pDelay" type="number" min="0" value="30" />
             <button type="button" class="btn btn-ghost" id="saveSettings">Enregistrer</button>
-            <p class="ok-msg" id="settingsOk" hidden>Coordonnées enregistrées.</p>
+            <p class="ok-msg" id="settingsOk" hidden>Moyens de paiement enregistrés.</p>
           </section>
         </div>
       </div>
@@ -117,6 +114,21 @@
       <div class="pf-actions">
         <button type="button" class="btn btn-ghost" value="cancel" id="invCancel">Annuler</button>
         <button type="submit" class="btn btn-gold" value="ok">Enregistrer</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="pf-modal" id="paidModal">
+    <form method="dialog" id="paidForm">
+      <h2 id="paidTitle">Facture payée</h2>
+      <p class="tarif-help" id="paidInfo"></p>
+      <label class="lab" for="paidMethod">Payée par</label>
+      <select class="pf-input" id="paidMethod"></select>
+      <label class="lab" for="paidDate">Le</label>
+      <input class="pf-input" id="paidDate" type="date" required />
+      <div class="pf-actions">
+        <button type="button" class="btn btn-ghost" id="paidCancel">Annuler</button>
+        <button type="submit" class="btn btn-gold" id="paidOk">Noter le paiement</button>
       </div>
     </form>
   </dialog>

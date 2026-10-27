@@ -18,6 +18,16 @@
     { offset: 10, label: "Relance ferme", tone: 3 },
     { offset: 20, label: "Mise en demeure", tone: 4 },
   ];
+  // Moyens de paiement que l’artisan peut proposer à ses clients (sans Stripe).
+  const PAY_METHODS = [
+    { key: "virement", label: "Virement bancaire", field: "IBAN", placeholder: "FR76 …" },
+    { key: "cheque", label: "Chèque", field: "À l’ordre de", placeholder: "Nom de l’entreprise" },
+    { key: "especes", label: "Espèces", field: "", placeholder: "" },
+    { key: "carte", label: "Carte bancaire sur place", field: "", placeholder: "" },
+    { key: "paypal", label: "PayPal", field: "Adresse PayPal ou lien paypal.me", placeholder: "paypal.me/monentreprise" },
+    { key: "wero", label: "Wero", field: "Numéro de téléphone ou e-mail", placeholder: "06 12 34 56 78" },
+    { key: "lien", label: "Lien de paiement (SumUp, Lydia Pro, PayPlug…)", field: "Adresse du lien", placeholder: "https://…" },
+  ];
   const SESSION = "artisan-devis.session";
   const SESSION_ARTISAN = "artisan-devis.session.artisan";
   const DEFAULT_ARTISAN_ID = "art_demo_01";
@@ -1758,8 +1768,21 @@
     return {
       invoices: [],
       steps: DEFAULT_PAY_STEPS.map((step) => ({ ...step })),
-      settings: { iban: "", link: "", delay: 30 },
+      settings: { iban: "", link: "", delay: 30, methods: normalizeMethods({}, "", "") },
     };
+  }
+
+  function normalizeMethods(raw, iban, link) {
+    const src = raw && typeof raw === "object" ? raw : {};
+    const out = {};
+    for (const m of PAY_METHODS) {
+      const cur = src[m.key] && typeof src[m.key] === "object" ? src[m.key] : {};
+      out[m.key] = { on: Boolean(cur.on), value: String(cur.value || "") };
+    }
+    // Reprise des anciens champs : IBAN → virement, lien → lien de paiement.
+    if (iban && !out.virement.value) out.virement = { on: true, value: iban };
+    if (link && !out.lien.value) out.lien = { on: true, value: link };
+    return out;
   }
 
   function normalizePayments(raw) {
@@ -1772,11 +1795,16 @@
         label: String(step.label || DEFAULT_PAY_STEPS[index] && DEFAULT_PAY_STEPS[index].label || "Relance"),
         tone: Number(step.tone) || index + 1,
       })),
-      settings: {
-        iban: String((data.settings && data.settings.iban) || ""),
-        link: String((data.settings && data.settings.link) || ""),
-        delay: Number(data.settings && data.settings.delay) || 30,
-      },
+      settings: (function () {
+        const st = data.settings || {};
+        const methods = normalizeMethods(st.methods, String(st.iban || ""), String(st.link || ""));
+        return {
+          iban: methods.virement.on ? methods.virement.value : "",
+          link: methods.lien.on ? methods.lien.value : "",
+          delay: Number(st.delay) || 30,
+          methods,
+        };
+      })(),
     };
   }
 
@@ -1799,6 +1827,13 @@
     return next;
   }
 
+  const METHODS_MIGRATION_NOTE =
+    "Les moyens de paiement ne sont pas encore en base. Exécutez la migration 20261027200000_payment_methods.sql dans le SQL Editor Supabase. Seuls l’IBAN et le lien sont enregistrés en attendant.";
+
+  function methodsColumnMissing(error) {
+    return /methods|paid_method/i.test(String((error && error.message) || ""));
+  }
+
   function paymentTableMissing(error) {
     const msg = String((error && error.message) || error || "");
     return /dv_payment_|schema cache|does not exist|relation/i.test(msg);
@@ -1819,6 +1854,7 @@
       issue: row.issued_on,
       due: row.due_on,
       paidAt: row.paid_at || null,
+      paidMethod: row.paid_method || "",
       reminders,
       lastStep: Number(row.last_step) || 0,
     };
@@ -1902,6 +1938,7 @@
         iban: settingsRow.iban || "",
         link: settingsRow.payment_link || "",
         delay: settingsRow.delay_days || 30,
+        methods: settingsRow.methods || {},
       },
     });
     return clonePayments(paymentCache);
@@ -1916,17 +1953,21 @@
       emit();
       return clonePayments(paymentCache);
     }
-    const settingsWrite = await client.from("dv_payment_settings").upsert(
-      {
-        artisan_id: artisan.dbId,
-        iban: next.settings.iban,
-        payment_link: next.settings.link,
-        delay_days: next.settings.delay,
-        steps: next.steps,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "artisan_id" }
-    );
+    const settingsRow = {
+      artisan_id: artisan.dbId,
+      iban: next.settings.iban,
+      payment_link: next.settings.link,
+      delay_days: next.settings.delay,
+      steps: next.steps,
+      methods: next.settings.methods,
+      updated_at: new Date().toISOString(),
+    };
+    let settingsWrite = await client.from("dv_payment_settings").upsert(settingsRow, { onConflict: "artisan_id" });
+    if (settingsWrite.error && methodsColumnMissing(settingsWrite.error)) {
+      delete settingsRow.methods;
+      lastError = METHODS_MIGRATION_NOTE;
+      settingsWrite = await client.from("dv_payment_settings").upsert(settingsRow, { onConflict: "artisan_id" });
+    }
     if (settingsWrite.error) {
       if (paymentTableMissing(settingsWrite.error)) {
         lastError =
@@ -1952,11 +1993,17 @@
         issued_on: invoice.issue || isoToday(),
         due_on: invoice.due || addIsoDays(invoice.issue || isoToday(), next.settings.delay),
         paid_at: invoice.paidAt || null,
+        paid_method: invoice.paidAt ? invoice.paidMethod || "" : "",
         reminders: invoice.reminders || [],
         last_step: Number(invoice.lastStep) || 0,
         updated_at: new Date().toISOString(),
       };
-      const written = await client.from("dv_payment_invoices").upsert(row, { onConflict: "public_id" });
+      let written = await client.from("dv_payment_invoices").upsert(row, { onConflict: "public_id" });
+      if (written.error && methodsColumnMissing(written.error)) {
+        delete row.paid_method;
+        lastError = METHODS_MIGRATION_NOTE;
+        written = await client.from("dv_payment_invoices").upsert(row, { onConflict: "public_id" });
+      }
       if (written.error && !/duplicate|unique|one_lead/i.test(written.error.message || "")) {
         if (paymentTableMissing(written.error)) {
           writeLocalPayments(next);
@@ -1972,6 +2019,7 @@
   }
 
   const Store = {
+    payMethods: PAY_METHODS,
     statuses: STATUSES,
     metiers: METIERS,
     maxPhotos: MAX_PHOTOS,
