@@ -1,0 +1,170 @@
+/* ---------------------------------------------------------------------------
+   Espace artisan sur téléphone.
+
+   Fichier séparé, chargé après dashboard.css, pour ne pas entrer en conflit
+   avec les autres chantiers en cours sur la feuille principale.
+
+   Trois choses y sont réglées :
+   1. un débordement horizontal de quelques pixels sur les écrans de 375 px ;
+   2. des zones tactiles trop petites pour un doigt ;
+   3. le zoom automatique d'iOS au moment de saisir un champ.
+--------------------------------------------------------------------------- */
+
+/* --- 1. Le débordement -----------------------------------------------------
+   Dans une grille, un élément refuse par défaut de rétrécir sous la largeur de
+   son contenu (min-width: auto). La barre latérale, passée en ligne sur
+   téléphone, imposait ainsi une colonne de 380 px dans un écran de 375 px, et
+   toute la page se décalait. On autorise le rétrécissement, et on laisse la
+   barre passer à la ligne plutôt que déborder. */
+@media (max-width: 900px) {
+  .app, .app > *, .side, .main, .top, .content { min-width: 0; }
+  .side { flex-wrap: wrap; }
+  .nav-side { min-width: 0; }
+  .side-brand { min-width: 0; }
+  .side-brand strong, .side-brand span {
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+}
+
+/* --- 2. Les zones tactiles -------------------------------------------------
+   Une cible de moins de 44 px se rate une fois sur trois avec un pouce, surtout
+   sur un chantier. On agrandit sans changer l'aspect : c'est la zone sensible
+   qui grandit, pas le dessin. */
+@media (hover: none) and (pointer: coarse) {
+  .nav-side a,
+  .side-foot a,
+  .side-foot button {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .btn, button:not(.dv-del):not(.eq-del) {
+    min-height: 44px;
+  }
+
+  select, input[type="text"], input[type="email"], input[type="tel"],
+  input[type="number"], input[type="date"], input[type="search"] {
+    min-height: 44px;
+  }
+
+  /* Cases à cocher : la case grossit un peu, et c'est surtout son libellé qui
+     sert de cible. Un pseudo-élément sur un input n'est pas rendu partout ;
+     agrandir le libellé, si. */
+  input[type="checkbox"], input[type="radio"] {
+    width: 22px; height: 22px;
+    flex-shrink: 0;
+  }
+  label:has(> input[type="checkbox"]),
+  label:has(> input[type="radio"]) {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+  /* Repli pour les navigateurs sans :has() — les libellés connus du site. */
+  .bulk-select, .tarif-check, .ic-check {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* Les liens d'une liste de demandes : toute la ligne devient cliquable. */
+  .list a, .doc-row a { min-height: 44px; display: flex; align-items: center; }
+}
+
+/* --- 3. Le zoom d'iOS ------------------------------------------------------
+   Safari agrandit la page dès qu'un champ sous 16 px reçoit le curseur, et
+   l'artisan se retrouve à faire glisser son écran pour retrouver le formulaire.
+   16 px exactement suffit à l'en empêcher. */
+@media (max-width: 900px) {
+  input, select, textarea { font-size: 16px; }
+}
+
+/* --- Détails de confort ---------------------------------------------------- */
+@media (max-width: 640px) {
+  /* Les boutons d'action passent en pleine largeur : plus faciles à viser,
+     et l'ordre de lecture reste clair. */
+  .actions .btn, .pf-inv-actions .btn { flex: 1 1 100%; }
+
+  /* Les tableaux larges défilent dans leur cadre plutôt que la page entière. */
+  .panel table { display: block; overflow-x: auto; max-width: 100%; }
+
+  /* Encoche et barre d'accueil des téléphones récents. */
+  .content { padding-bottom: calc(22px + env(safe-area-inset-bottom)); }
+  .side { padding-top: calc(14px + env(safe-area-inset-top)); }
+}
+
+/* Un écran très étroit (iPhone SE, vieux Android) garde des marges utiles. */
+@media (max-width: 380px) {
+  .top, .content { padding-left: 14px; padding-right: 14px; }
+  .side { padding-left: 14px; padding-right: 14px; }
+}
+
+/* --- 4. Un en-tête moins gourmand -----------------------------------------
+   Sur un écran de 667 px de haut, la barre du haut occupait près de 190 px,
+   soit presque un tiers de l'écran avant la première information utile. Elle
+   tient maintenant sur deux rangées : l'atelier, puis les onglets, qui défilent
+   latéralement s'ils sont trop nombreux. */
+@media (max-width: 900px) {
+  /* Deux rangées : l'atelier et le lien du widget côte à côte, puis les
+     onglets. Une grille nommée place chacun sans toucher au HTML. */
+  .side {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "brand widget"
+      "nav   nav";
+    align-items: center;
+    gap: 6px 12px;
+    padding: 8px 16px;
+  }
+  .side-brand { grid-area: brand; }
+  .nav-side { grid-area: nav; }
+  .side-brand { gap: 9px; }
+  .side-brand strong { font-size: 0.95rem; }
+  .side-brand span { font-size: 0.76rem; }
+  .bolt { width: 28px; height: 28px; border-radius: 8px; }
+
+  .nav-side {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 6px;
+    /* La barre de défilement ne doit pas manger une rangée de pixels. */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    margin: 0 -16px;
+    padding: 0 16px;
+  }
+  .nav-side::-webkit-scrollbar { display: none; }
+  .nav-side a { white-space: nowrap; flex: 0 0 auto; }
+
+  /* « Voir le widget » rejoint la rangée des onglets plutôt que d'occuper
+     une troisième ligne à lui seul. */
+  .side-foot { display: contents; }
+  #linkWidget {
+    grid-area: widget;
+    margin: 0;
+    justify-self: end;
+    font-size: 0.82rem;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+  }
+}
+
+/* --- 5. Les compteurs --------------------------------------------------- */
+@media (max-width: 900px) {
+  /* Empilés, trois chiffres occupaient 300 px avant la première demande. En
+     rangée, ils tiennent sur 90 px et restent lisibles : ce sont des nombres
+     courts, pas des phrases. auto-fit : deux par rangée si l'écran est étroit. */
+  .stats {
+    grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
+    gap: 8px;
+  }
+  .stats > * { padding: 11px 12px; }
+  .stats strong, .stats .kpi, .stats b { font-size: 1.35rem; letter-spacing: -0.03em; }
+  .stats span, .stats small { font-size: 0.72rem; line-height: 1.3; }
+}
