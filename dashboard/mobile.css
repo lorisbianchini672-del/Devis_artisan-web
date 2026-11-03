@@ -85,3 +85,24 @@
 @media (max-width: 380px) {
   .top, .content { padding-left: 14px; padding-right: 14px; }
 }
+
+/* --- 4. Le débordement quand les onglets se multiplient --------------------
+   Dans une grille, un élément refuse par défaut de rétrécir sous la largeur de
+   son contenu (min-width: auto). Tant que la barre du haut comptait deux
+   onglets, cela ne se voyait pas. Avec six, elle impose une colonne plus large
+   que l'écran et toute la page se décale, malgré son défilement latéral.
+   La règle ci-dessous vaut quel que soit le nombre d'onglets à venir. */
+@media (max-width: 900px) {
+  .app, .app > *, .side, .main, .top, .content { min-width: 0; }
+  .nav-side, .side-brand { min-width: 0; }
+  .side-brand strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+
+/* --- 5. Les liens du bas de barre restent accessibles ----------------------
+   refonte.css masque tout le bas de la barre sauf « Voir le widget » sur petit
+   écran, pour gagner de la place. Mais les sections qui s'y ajoutent — équipe,
+   import de clients — deviendraient alors introuvables depuis un téléphone.
+   Les liens reviennent, les boutons d'action restent masqués. */
+@media (max-width: 900px) {
+  .side-foot a { display: inline-flex !important; align-items: center; }
+}
