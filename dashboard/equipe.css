@@ -69,3 +69,13 @@
   .eq-item-actions { width: 100%; }
   .eq-item-actions button, .eq-item select { flex: 1; }
 }
+
+/* La barre du haut, passée en ligne sur téléphone, impose sinon une colonne
+   plus large que l'écran : dans une grille, un élément refuse par défaut de
+   rétrécir sous la largeur de son contenu. Quelques pixels de décalage et un
+   glissement latéral parasite à chaque défilement. */
+@media (max-width: 900px) {
+  .app, .app > *, .side, .main, .top, .content { min-width: 0; }
+  .nav-side, .side-brand { min-width: 0; }
+  .side-brand strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
