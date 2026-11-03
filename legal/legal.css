@@ -1,0 +1,88 @@
+/* Pages légales : document long, lisible, aux couleurs du site. */
+
+body {
+  background: var(--navy);
+  color: var(--paper);
+}
+
+[hidden] { display: none !important; }
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; border-radius: 6px; }
+
+.wrap { max-width: 880px; margin: 0 auto; padding-left: 24px; padding-right: 24px; }
+
+/* En-tête */
+.bar { display: flex; align-items: center; gap: 20px; padding: 22px 0; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; text-decoration: none; color: inherit; letter-spacing: -0.02em; }
+.bolt { width: 34px; height: 34px; border-radius: 10px; background: var(--gold); color: var(--navy); display: grid; place-items: center; font-weight: 700; }
+.bar nav { margin-left: auto; display: flex; gap: 20px; font-size: 0.92rem; }
+.bar nav a { color: rgba(243, 238, 228, 0.7); text-decoration: none; }
+.bar nav a:hover, .bar nav a[aria-current="page"] { color: var(--paper); }
+
+/* Le document lui-même : fond clair, texte sombre, pour une longue lecture. */
+.doc {
+  background: var(--card);
+  color: var(--ink);
+  border-radius: var(--radius);
+  padding: 48px 56px 56px;
+  margin-bottom: 56px;
+  box-shadow: var(--shadow);
+}
+
+.doc h1 { font-size: 2rem; letter-spacing: -0.03em; line-height: 1.15; }
+.doc .updated { margin-top: 10px; font-size: 0.88rem; color: var(--muted); }
+.doc h2 {
+  font-size: 1.18rem; letter-spacing: -0.02em; margin-top: 40px;
+  padding-top: 22px; border-top: 1px solid var(--line);
+}
+.doc h3 { font-size: 1rem; margin-top: 24px; }
+.doc { overflow-wrap: break-word; }
+.doc p, .doc li { font-size: 0.97rem; line-height: 1.65; color: #213246; }
+.doc p { margin-top: 12px; }
+.doc ul, .doc ol { margin-top: 12px; padding-left: 22px; }
+.doc li { margin-top: 7px; }
+.doc strong { color: var(--ink); }
+.doc a { color: var(--gold-deep); }
+
+/* Encadré d'avertissement : à retirer quand le texte est validé. */
+.draft {
+  background: #FFF8E1;
+  border: 1px solid var(--gold-deep);
+  border-left: 5px solid var(--gold-deep);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 32px;
+}
+.draft p { margin-top: 8px; font-size: 0.92rem; }
+.draft p:first-child { margin-top: 0; font-weight: 600; }
+
+/* Champ à compléter avant mise en ligne. */
+.todo {
+  background: #FDECEC;
+  color: var(--danger);
+  border-radius: 5px;
+  padding: 1px 7px;
+  font-size: 0.88em;
+  font-weight: 600;
+}
+
+/* Tableau (sous-traitants, durées de conservation) */
+.doc table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 0.92rem; }
+.doc th, .doc td { text-align: left; padding: 11px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.doc th { font-weight: 600; color: var(--muted); font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.doc td { color: #213246; }
+
+.foot { border-top: 1px solid rgba(243, 238, 228, 0.14); padding: 26px 0 40px; display: flex; flex-wrap: wrap; gap: 12px 24px; font-size: 0.85rem; color: rgba(243, 238, 228, 0.68); }
+.foot a { color: inherit; text-decoration: none; }
+.foot a:hover { color: var(--paper); }
+
+@media (max-width: 760px) {
+  .wrap { padding-left: 16px; padding-right: 16px; }
+  .doc { padding: 32px 22px 40px; border-radius: 14px; }
+  .doc h1 { font-size: 1.6rem; }
+  .bar nav { gap: 14px; font-size: 0.85rem; }
+  .doc table, .doc thead, .doc tbody, .doc tr, .doc th, .doc td { display: block; }
+  .doc thead { display: none; }
+  .doc tr { border-bottom: 1px solid var(--line); padding: 10px 0; }
+  .doc td { border: 0; padding: 3px 0; }
+  .doc td::before { content: attr(data-label) " : "; font-weight: 600; color: var(--muted); }
+}
