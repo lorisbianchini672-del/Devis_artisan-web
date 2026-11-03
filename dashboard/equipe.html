@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Mon équipe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <link rel="stylesheet" href="dashboard.css" />
+  <link rel="stylesheet" href="equipe.css" />
+</head>
+<body class="dash">
+  <div class="app">
+    <aside class="side">
+      <div class="side-brand">
+        <div class="bolt" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h7l-1 8 10-14h-7l0-6z"/></svg>
+        </div>
+        <div>
+          <strong id="brandName">Espace artisan</strong>
+          <span id="brandMetier">Artisan</span>
+        </div>
+      </div>
+      <nav class="nav-side">
+        <a href="index.html">Tableau de bord</a>
+        <a href="paiements.html">Paiements</a>
+        <a class="is-on" href="equipe.html">Mon équipe</a>
+      </nav>
+      <div class="side-foot">
+        <a id="linkWidget" href="../widget/index.html">Voir le widget</a>
+        <a href="index.html">← Retour au tableau de bord</a>
+        <button type="button" id="logout">Se déconnecter</button>
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="top">
+        <h1>Mon équipe</h1>
+        <p class="calib-count" id="roleBadge" hidden></p>
+      </header>
+
+      <div class="content eq-page">
+        <p class="error" id="pageError" hidden></p>
+
+        <section class="panel">
+          <h2>Qui fait quoi</h2>
+          <p class="eq-lead">Chaque personne a son propre compte. Ce qu’elle voit dépend de son rôle, et la base le fait respecter : masquer un bouton ne suffirait pas.</p>
+          <div class="eq-roles" id="roleCards"></div>
+        </section>
+
+        <section class="panel" id="addPanel" hidden>
+          <h2>Ajouter quelqu’un</h2>
+          <p class="eq-lead">Indiquez son adresse électronique et son rôle. Elle n’a pas besoin d’un compte tout de suite : dites-lui de s’inscrire avec cette adresse, et son accès s’ouvrira seul.</p>
+          <div class="eq-add">
+            <div>
+              <label class="lab" for="newEmail">Adresse électronique</label>
+              <input id="newEmail" type="email" maxlength="160" placeholder="prenom@entreprise.fr" />
+            </div>
+            <div>
+              <label class="lab" for="newName">Nom (facultatif)</label>
+              <input id="newName" type="text" maxlength="80" placeholder="Karim B." />
+            </div>
+            <div>
+              <label class="lab" for="newRole">Rôle</label>
+              <select id="newRole"></select>
+            </div>
+            <div class="eq-add-btn">
+              <button type="button" class="btn btn-gold" id="addBtn">Ajouter</button>
+            </div>
+          </div>
+          <p class="error" id="addError" hidden></p>
+          <p class="ok-msg" id="addOk" hidden></p>
+        </section>
+
+        <section class="panel">
+          <h2>Membres</h2>
+          <p class="empty" id="listEmpty" hidden>Aucun membre pour l’instant.</p>
+          <ul class="eq-list" id="memberList"></ul>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="../shared/supabase-config.js"></script>
+  <script src="../shared/store.js"></script>
+  <script src="../shared/equipe.js"></script>
+  <script src="equipe.js"></script>
+</body>
+</html>

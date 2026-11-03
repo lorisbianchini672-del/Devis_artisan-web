@@ -1,0 +1,71 @@
+/* Équipe : rôles, ajout d'un membre, liste. */
+
+.eq-page { display: grid; gap: 20px; min-width: 0; }
+.eq-page > * { min-width: 0; }
+.eq-page .lab { display: block; font-size: 0.78rem; font-weight: 700; margin-bottom: 5px; color: var(--ink); }
+.eq-lead { color: var(--muted); font-size: 0.94rem; line-height: 1.6; margin-bottom: 18px; max-width: 72ch; }
+
+/* Les trois rôles, expliqués */
+.eq-roles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.eq-role {
+  border: 1px solid var(--line); border-radius: 14px;
+  padding: 16px 18px; background: var(--paper);
+}
+.eq-role strong { display: block; font-size: 1rem; margin-bottom: 6px; }
+.eq-role span { font-size: 0.87rem; color: var(--muted); line-height: 1.5; }
+.eq-role.is-mine { border-color: var(--gold-deep); background: #FFF8E1; }
+.eq-role.is-mine strong::after {
+  content: "votre rôle"; margin-left: 8px;
+  font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+  color: var(--gold-deep); vertical-align: 2px;
+}
+
+/* Ajout */
+.eq-add { display: grid; grid-template-columns: 1.4fr 1fr 1fr auto; gap: 14px; align-items: end; }
+.eq-add input, .eq-add select {
+  width: 100%; padding: 10px 12px;
+  border: 1px solid var(--line); border-radius: 10px;
+  background: #fff; color: var(--ink); font: inherit;
+}
+.eq-add input:focus-visible, .eq-add select:focus-visible { outline: 3px solid var(--gold); outline-offset: 1px; }
+
+/* Liste */
+.eq-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 9px; }
+.eq-item {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  padding: 13px 15px; border: 1px solid var(--line); border-radius: 12px; background: #fff;
+}
+.eq-item-main { flex: 1 1 240px; min-width: 0; }
+.eq-item-main strong { display: block; font-size: 0.96rem; }
+.eq-item-main span { display: block; font-size: 0.84rem; color: var(--muted); margin-top: 2px; }
+.eq-tag {
+  font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+  border-radius: 999px; padding: 3px 9px;
+}
+.eq-tag.is-invite { background: #FFF4D6; color: #6B5415; }
+.eq-tag.is-suspendu { background: var(--danger-bg); color: var(--danger); }
+.eq-tag.is-moi { background: var(--ok-bg); color: var(--ok); }
+.eq-item select {
+  padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px;
+  background: #fff; color: var(--ink); font: inherit; font-size: 0.87rem;
+}
+.eq-item-actions { display: flex; gap: 7px; align-items: center; }
+.eq-item-actions button {
+  border: 1px solid var(--line); border-radius: 8px; background: #fff;
+  padding: 6px 11px; font: inherit; font-size: 0.85rem; cursor: pointer; color: var(--ink);
+}
+.eq-item-actions button:hover { border-color: var(--navy-soft); }
+.eq-item-actions .eq-del:hover { border-color: var(--danger); color: var(--danger); }
+.eq-readonly { font-size: 0.85rem; color: var(--muted); }
+
+@media (max-width: 900px) {
+  .eq-roles { grid-template-columns: 1fr; }
+  .eq-add { grid-template-columns: 1fr 1fr; }
+  .eq-add-btn { grid-column: 1 / -1; }
+  .eq-add-btn .btn { width: 100%; }
+}
+@media (max-width: 560px) {
+  .eq-add { grid-template-columns: 1fr; }
+  .eq-item-actions { width: 100%; }
+  .eq-item-actions button, .eq-item select { flex: 1; }
+}
