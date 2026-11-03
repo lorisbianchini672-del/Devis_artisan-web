@@ -1,0 +1,225 @@
+/* Devis dicté : page de rédaction, table de lignes, impression. */
+
+/* min-width: 0 — sans cela, une grille refuse de rétrécir sous la largeur de
+   son contenu, et le tableau des lignes déborde l'écran sur téléphone. */
+.dv-page { display: grid; gap: 20px; min-width: 0; }
+.dv-page > * { min-width: 0; }
+.dv-page .lab { display: block; font-size: 0.78rem; font-weight: 700; margin-bottom: 5px; color: var(--ink); }
+.dv-dictee textarea {
+  width: 100%; padding: 12px 14px;
+  border: 1px solid var(--line); border-radius: 12px;
+  background: #fff; color: var(--ink); font: inherit; line-height: 1.55;
+  resize: vertical; min-height: 130px;
+}
+.dv-dictee textarea:focus-visible { outline: 3px solid var(--gold); outline-offset: 1px; }
+.dv-lead { color: var(--muted); font-size: 0.94rem; line-height: 1.6; margin-bottom: 18px; max-width: 72ch; }
+/* Libellé réservé aux lecteurs d'écran. Il faut un ancêtre positionné, sinon
+   il se place par rapport à la page et élargit celle-ci au-delà de l'écran. */
+.dv-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.dv-table th { position: relative; }
+
+/* ------------------------------------------------------------- dictée --- */
+.dv-mic-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+
+.dv-mic {
+  display: inline-flex; align-items: center; gap: 11px;
+  padding: 13px 22px 13px 16px;
+  border: 0; border-radius: 999px;
+  background: var(--navy); color: var(--paper);
+  font: inherit; font-weight: 600; cursor: pointer;
+  transition: background 0.2s var(--ease), transform 0.12s var(--ease);
+}
+.dv-mic:hover { background: var(--navy-soft); }
+.dv-mic:active { transform: scale(0.97); }
+.dv-mic-icon { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: rgba(244, 196, 48, 0.2); color: var(--gold); }
+.dv-mic[aria-pressed="true"] { background: var(--danger); }
+.dv-mic[aria-pressed="true"] .dv-mic-icon { background: rgba(255, 255, 255, 0.22); color: #fff; animation: dv-pulse 1.4s ease-in-out infinite; }
+@keyframes dv-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+@media (prefers-reduced-motion: reduce) { .dv-mic[aria-pressed="true"] .dv-mic-icon { animation: none; } }
+.dv-mic[disabled] { opacity: 0.5; cursor: not-allowed; }
+
+.dv-mic-state { color: var(--muted); font-size: 0.88rem; margin: 0; flex: 1 1 240px; }
+.dv-interim { color: var(--muted); font-style: italic; font-size: 0.9rem; margin-top: 8px; }
+.dv-dictee-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+.dv-note { margin-top: 12px; font-size: 0.9rem; color: var(--muted); }
+.dv-note.is-warn { color: var(--danger); }
+
+/* -------------------------------------------------------------- devis --- */
+.dv-quote-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.dv-number {
+  font-size: 0.8rem; font-weight: 600; letter-spacing: 0.04em;
+  background: var(--paper); color: var(--muted);
+  border-radius: 999px; padding: 4px 11px;
+}
+
+.dv-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 18px; margin-bottom: 24px; }
+.dv-fields input {
+  width: 100%; padding: 10px 12px;
+  border: 1px solid var(--line); border-radius: 10px;
+  background: #fff; color: var(--ink); font: inherit;
+}
+.dv-fields input:focus-visible { outline: 3px solid var(--gold); outline-offset: 1px; }
+
+.dv-table-wrap { overflow-x: auto; max-width: 100%; }
+.dv-table { width: 100%; border-collapse: collapse; min-width: 640px; }
+.dv-table th {
+  text-align: left; padding: 9px 10px;
+  font-size: 0.74rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+  color: var(--muted); border-bottom: 1px solid var(--line);
+}
+.dv-table td { padding: 7px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.dv-c-qty, .dv-c-price, .dv-c-total { width: 112px; }
+.dv-c-unit { width: 104px; }
+.dv-c-del { width: 40px; }
+.dv-table th.dv-c-price, .dv-table th.dv-c-total, .dv-table th.dv-c-qty { text-align: right; }
+
+.dv-table input, .dv-table select, .dv-table textarea {
+  width: 100%; padding: 8px 9px;
+  border: 1px solid transparent; border-radius: 8px;
+  background: var(--paper); color: var(--ink); font: inherit; font-size: 0.92rem;
+}
+.dv-table input:hover, .dv-table select:hover, .dv-table textarea:hover { border-color: var(--line); }
+.dv-table input:focus-visible, .dv-table select:focus-visible, .dv-table textarea:focus-visible {
+  outline: 3px solid var(--gold); outline-offset: 1px; background: #fff;
+}
+.dv-table textarea { resize: vertical; min-height: 36px; }
+.dv-num { text-align: right; font-variant-numeric: tabular-nums; }
+.dv-line-total { display: block; padding: 8px 9px; text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+
+/* Prix laissé à compléter : signalé sans bloquer. */
+.dv-row.is-todo .dv-price { background: #FFF4D6; border-color: var(--gold-deep); }
+.dv-origin { display: block; margin-top: 4px; font-size: 0.74rem; color: var(--muted); padding-left: 9px; }
+.dv-origin.is-todo { color: var(--gold-deep); font-weight: 600; }
+
+.dv-del {
+  width: 32px; height: 32px; border: 0; border-radius: 8px;
+  background: transparent; color: var(--muted); cursor: pointer; font-size: 1.1rem; line-height: 1;
+}
+.dv-del:hover { background: var(--danger-bg); color: var(--danger); }
+
+.dv-add { margin-top: 14px; }
+.dv-todo {
+  margin-top: 16px; padding: 12px 14px;
+  background: #FFF8E1; border: 1px solid var(--gold-deep); border-radius: 10px;
+  font-size: 0.9rem; color: #6B5415;
+}
+
+.dv-bottom { display: grid; min-width: 0; grid-template-columns: minmax(0, 1fr) 300px; gap: 28px; margin-top: 26px; align-items: start; }
+.dv-bottom textarea, .dv-bottom select {
+  width: 100%; padding: 10px 12px;
+  border: 1px solid var(--line); border-radius: 10px;
+  background: #fff; color: var(--ink); font: inherit;
+}
+.dv-inline { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 14px; }
+
+.dv-totals { background: var(--paper); border-radius: var(--radius); padding: 18px 20px; }
+.dv-total-row { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; padding: 7px 0; font-size: 0.94rem; }
+.dv-total-row strong { font-variant-numeric: tabular-nums; }
+.dv-total-ttc { border-top: 1px solid var(--line); margin-top: 7px; padding-top: 13px; font-size: 1.08rem; }
+.dv-total-ttc strong { color: var(--navy); font-size: 1.25rem; letter-spacing: -0.02em; }
+
+.dv-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 24px; }
+.dv-danger:hover { border-color: var(--danger); color: var(--danger); }
+
+/* ---------------------------------------------------------- historique --- */
+.dv-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 9px; }
+.dv-item {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  padding: 13px 15px; border: 1px solid var(--line); border-radius: 12px;
+  background: #fff;
+}
+.dv-item:hover { border-color: var(--navy-soft); }
+.dv-item-main { flex: 1 1 220px; min-width: 0; }
+.dv-item-main strong { display: block; font-size: 0.96rem; }
+.dv-item-main span { display: block; font-size: 0.84rem; color: var(--muted); margin-top: 2px; }
+.dv-item-sum { font-variant-numeric: tabular-nums; font-weight: 600; }
+.dv-item-actions { display: flex; gap: 7px; }
+.dv-item-actions button {
+  border: 1px solid var(--line); border-radius: 8px; background: #fff;
+  padding: 6px 11px; font: inherit; font-size: 0.85rem; cursor: pointer; color: var(--ink);
+}
+.dv-item-actions button:hover { border-color: var(--navy-soft); }
+.dv-item-actions .dv-item-del:hover { border-color: var(--danger); color: var(--danger); }
+
+/* ---------------------------------------------------------- impression --- */
+.dv-print { display: none; }
+
+@media print {
+  body.dash { background: #fff; }
+  .app, .side, .top, .dv-dictee, .dv-history, .dv-actions, .dv-add { display: none !important; }
+  .dv-print { display: block; padding: 0; color: #000; font-size: 11pt; }
+  .dv-print h1 { font-size: 18pt; margin-bottom: 4pt; }
+  .dv-print .p-sub { color: #444; margin-bottom: 18pt; }
+  .dv-print .p-parties { display: flex; justify-content: space-between; gap: 24pt; margin-bottom: 20pt; }
+  .dv-print .p-parties div { flex: 1; }
+  .dv-print .p-parties strong { display: block; font-size: 9pt; text-transform: uppercase; letter-spacing: 0.06em; color: #555; margin-bottom: 4pt; }
+  .dv-print table { width: 100%; border-collapse: collapse; margin-bottom: 16pt; }
+  .dv-print th { text-align: left; border-bottom: 1.5pt solid #000; padding: 5pt 4pt; font-size: 9pt; text-transform: uppercase; letter-spacing: 0.04em; }
+  .dv-print td { border-bottom: 0.5pt solid #bbb; padding: 6pt 4pt; vertical-align: top; }
+  .dv-print .p-num { text-align: right; white-space: nowrap; }
+  .dv-print .p-totals { margin-left: auto; width: 48%; }
+  .dv-print .p-totals tr td:last-child { text-align: right; font-weight: 600; }
+  .dv-print .p-ttc td { border-top: 1.5pt solid #000; border-bottom: 0; font-size: 13pt; padding-top: 7pt; }
+  .dv-print .p-notes { margin-top: 14pt; }
+  .dv-print .p-legal { margin-top: 22pt; font-size: 8.5pt; color: #555; line-height: 1.5; }
+  .dv-print .p-sign { margin-top: 26pt; font-size: 9pt; }
+  .dv-print .p-sign span { display: inline-block; border-bottom: 0.5pt solid #000; width: 190pt; margin-left: 8pt; }
+  @page { margin: 16mm; }
+}
+
+/* ------------------------------------------------------------- mobile --- */
+@media (max-width: 860px) {
+  .dv-fields { grid-template-columns: 1fr; }
+  .dv-bottom { grid-template-columns: 1fr; gap: 20px; }
+}
+@media (max-width: 560px) {
+  .dv-inline { grid-template-columns: 1fr; }
+  .dv-mic { width: 100%; justify-content: center; }
+  .dv-dictee-actions .btn, .dv-actions .btn { flex: 1 1 100%; }
+  .dv-item-actions { width: 100%; }
+  .dv-item-actions button { flex: 1; }
+}
+
+/* ------------------------------------------------- lignes sur téléphone ---
+   Sous 700 px, le tableau devient une pile de fiches : plus de défilement
+   horizontal, chaque ligne du devis tient dans la largeur de l'écran. */
+@media (max-width: 700px) {
+  .dv-table, .dv-table tbody, .dv-table tr, .dv-table td { display: block; width: auto; }
+  .dv-table { min-width: 0; }
+  .dv-table thead { display: none; }
+
+  .dv-row {
+    position: relative;
+    border: 1px solid var(--line); border-radius: 12px;
+    padding: 12px 44px 12px 12px;
+    margin-bottom: 10px; background: #fff;
+  }
+  .dv-row.is-todo { border-color: var(--gold-deep); background: #FFFDF5; }
+  .dv-table td { border: 0; padding: 0; }
+
+  /* Prestation en pleine largeur, puis trois champs côte à côte. */
+  .dv-row td:first-child { margin-bottom: 10px; }
+  .dv-row td:nth-child(2), .dv-row td:nth-child(3), .dv-row td:nth-child(4) {
+    display: inline-block; width: calc(33.333% - 7px); vertical-align: top;
+  }
+  .dv-row td:nth-child(3), .dv-row td:nth-child(4) { margin-left: 8px; }
+  .dv-row td[data-label]::before {
+    content: attr(data-label);
+    display: block; margin-bottom: 4px;
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.04em; color: var(--muted);
+  }
+  .dv-row td:nth-child(5) {
+    margin-top: 10px; padding-top: 9px; border-top: 1px solid var(--line);
+    display: flex; justify-content: space-between; align-items: baseline;
+  }
+  .dv-row td:nth-child(5)::before { margin-bottom: 0; }
+  /* Étiquette courte quand la place manque. */
+  .dv-row td[data-short]::before { content: attr(data-short); }
+  .dv-line-total { padding: 0; font-size: 1.02rem; }
+
+  /* La croix de suppression passe en coin de fiche. */
+  .dv-row td:last-child { position: absolute; top: 8px; right: 8px; }
+  .dv-origin { padding-left: 0; }
+  .dv-table input, .dv-table select, .dv-table textarea { background: var(--paper); }
+}

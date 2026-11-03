@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Nouveau devis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <link rel="stylesheet" href="dashboard.css" />
+  <link rel="stylesheet" href="devis.css" />
+</head>
+<body class="dash">
+  <div class="app">
+    <aside class="side">
+      <div class="side-brand">
+        <div class="bolt" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h7l-1 8 10-14h-7l0-6z"/></svg>
+        </div>
+        <div>
+          <strong id="brandName">Espace artisan</strong>
+          <span id="brandMetier">Artisan</span>
+        </div>
+      </div>
+      <nav class="nav-side">
+        <a href="index.html">Tableau de bord</a>
+        <a class="is-on" href="devis.html">Devis</a>
+        <a href="paiements.html">Paiements</a>
+      </nav>
+      <div class="side-foot">
+        <a id="linkWidget" href="../widget/index.html">Voir le widget</a>
+        <a href="index.html">← Retour au tableau de bord</a>
+        <button type="button" id="logout">Se déconnecter</button>
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="top">
+        <h1>Devis</h1>
+        <p class="calib-count" id="quoteCount">Aucun devis</p>
+      </header>
+
+      <div class="content dv-page">
+        <p class="error" id="pageError" hidden></p>
+
+        <!-- ------------------------------------------------ Dictée --------- -->
+        <section class="panel dv-dictee">
+          <h2>Dictez votre devis</h2>
+          <p class="dv-lead">Décrivez le chantier comme vous l’expliqueriez à un collègue : les prestations, les quantités, les pièces. L’IA met tout en lignes de devis, avec <strong>vos prix</strong>. Elle n’en invente aucun : ce qu’elle ne reconnaît pas, elle vous le laisse à chiffrer.</p>
+
+          <div class="dv-mic-row">
+            <button type="button" class="dv-mic" id="micBtn" aria-pressed="false">
+              <span class="dv-mic-icon" aria-hidden="true">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/><path d="M19 11a1 1 0 1 0-2 0 5 5 0 0 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 6 6.93V21a1 1 0 1 0 2 0v-3.07A7 7 0 0 0 19 11z"/></svg>
+              </span>
+              <span class="dv-mic-label" id="micLabel">Dicter</span>
+            </button>
+            <p class="dv-mic-state" id="micState">Appuyez et parlez. Vous pouvez aussi écrire directement.</p>
+          </div>
+
+          <label class="lab" for="transcript">Votre dictée</label>
+          <textarea id="transcript" rows="7" placeholder="Ex. Chez madame Martin, rue Victor Hugo. Je remplace le tableau électrique treize modules, je pose quatre prises dans la cuisine et deux points lumineux dans le salon. Il y a une journée de main-d’œuvre."></textarea>
+          <p class="dv-interim" id="interim" hidden></p>
+
+          <div class="dv-dictee-actions">
+            <button type="button" class="btn btn-gold" id="draftBtn">Rédiger le devis</button>
+            <button type="button" class="btn btn-ghost" id="blankBtn">Partir d’un devis vide</button>
+          </div>
+          <p class="dv-note" id="draftNote" hidden></p>
+        </section>
+
+        <!-- ------------------------------------------------ Le devis ------- -->
+        <section class="panel dv-quote" id="quotePanel" hidden>
+          <div class="dv-quote-head">
+            <h2 id="quoteHeading">Devis</h2>
+            <span class="dv-number" id="quoteNumber" hidden></span>
+          </div>
+
+          <div class="dv-fields">
+            <div>
+              <label class="lab" for="qTitle">Objet du devis</label>
+              <input id="qTitle" type="text" maxlength="140" placeholder="Rénovation électrique cuisine et salon" />
+            </div>
+            <div>
+              <label class="lab" for="qClient">Client</label>
+              <input id="qClient" type="text" maxlength="120" placeholder="Mme Martin" />
+            </div>
+            <div>
+              <label class="lab" for="qEmail">Adresse électronique du client</label>
+              <input id="qEmail" type="email" maxlength="160" placeholder="client@exemple.fr" />
+            </div>
+            <div>
+              <label class="lab" for="qAddress">Adresse du chantier</label>
+              <input id="qAddress" type="text" maxlength="200" placeholder="12 rue Victor Hugo, 69100 Villeurbanne" />
+            </div>
+          </div>
+
+          <div class="dv-table-wrap">
+            <table class="dv-table">
+              <thead>
+                <tr>
+                  <th class="dv-c-label">Prestation</th>
+                  <th class="dv-c-qty">Qté</th>
+                  <th class="dv-c-unit">Unité</th>
+                  <th class="dv-c-price">Prix unitaire HT</th>
+                  <th class="dv-c-total">Total HT</th>
+                  <th class="dv-c-del"><span class="dv-sr">Retirer</span></th>
+                </tr>
+              </thead>
+              <tbody id="lineRows"></tbody>
+            </table>
+          </div>
+          <button type="button" class="btn btn-ghost dv-add" id="addLine">+ Ajouter une ligne</button>
+
+          <p class="dv-todo" id="todoNote" hidden></p>
+
+          <div class="dv-bottom">
+            <div class="dv-bottom-left">
+              <label class="lab" for="qNotes">Remarques (visibles sur le devis)</label>
+              <textarea id="qNotes" rows="3" maxlength="600" placeholder="Fourniture comprise. Intervention sur une journée."></textarea>
+              <div class="dv-inline">
+                <div>
+                  <label class="lab" for="qVat">TVA</label>
+                  <select id="qVat">
+                    <option value="20">20 % — taux normal</option>
+                    <option value="10">10 % — rénovation (logement de plus de 2 ans)</option>
+                    <option value="5.5">5,5 % — rénovation énergétique</option>
+                    <option value="0">0 % — non assujetti</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="lab" for="qValidity">Validité</label>
+                  <select id="qValidity">
+                    <option value="15">15 jours</option>
+                    <option value="30" selected>30 jours</option>
+                    <option value="60">60 jours</option>
+                    <option value="90">90 jours</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="dv-totals">
+              <div class="dv-total-row"><span>Total HT</span><strong id="totHt">0,00 €</strong></div>
+              <div class="dv-total-row"><span id="tvaLabel">TVA 20 %</span><strong id="totTva">0,00 €</strong></div>
+              <div class="dv-total-row dv-total-ttc"><span>Total TTC</span><strong id="totTtc">0,00 €</strong></div>
+            </div>
+          </div>
+
+          <p class="error" id="saveError" hidden></p>
+          <p class="ok-msg" id="saveOk" hidden>Devis enregistré.</p>
+
+          <div class="dv-actions">
+            <button type="button" class="btn btn-gold" id="saveBtn">Enregistrer</button>
+            <button type="button" class="btn btn-ghost" id="printBtn">Imprimer ou enregistrer en PDF</button>
+            <button type="button" class="btn btn-ghost dv-danger" id="closeBtn">Fermer</button>
+          </div>
+        </section>
+
+        <!-- ------------------------------------------------ Historique ----- -->
+        <section class="panel dv-history">
+          <h2>Vos devis</h2>
+          <p class="empty" id="historyEmpty">Aucun devis pour l’instant.</p>
+          <ul class="dv-list" id="historyList"></ul>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mise en page d'impression : seule cette zone part sur le papier. -->
+  <div class="dv-print" id="printArea" aria-hidden="true"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="../shared/supabase-config.js"></script>
+  <script src="../shared/store.js"></script>
+  <script src="../shared/devis.js"></script>
+  <script src="devis.js"></script>
+</body>
+</html>
