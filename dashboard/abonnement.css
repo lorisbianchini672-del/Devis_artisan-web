@@ -53,3 +53,13 @@
 .ab-plan .btn { margin-top: auto; justify-content: center; min-height: 46px; }
 .ab-mine { margin-top: auto; font-weight: 700; color: var(--gold-deep); }
 .ab-empty, .ab-note { color: var(--muted); font-size: 0.85rem; line-height: 1.5; max-width: 70ch; }
+
+/* La barre du haut, passée en ligne sur téléphone, impose sinon une colonne
+   plus large que l'écran : dans une grille, un élément refuse par défaut de
+   rétrécir sous la largeur de son contenu. Quelques pixels de décalage et un
+   glissement latéral parasite à chaque défilement. */
+@media (max-width: 900px) {
+  .app, .app > *, .side, .main, .top, .content { min-width: 0; }
+  .nav-side, .side-brand { min-width: 0; }
+  .side-brand strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
