@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Importer mes clients</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <link rel="stylesheet" href="dashboard.css" />
+  <link rel="stylesheet" href="import-clients.css" />
+</head>
+<body class="dash">
+  <div class="app">
+    <aside class="side">
+      <div class="side-brand">
+        <div class="bolt" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h7l-1 8 10-14h-7l0-6z"/></svg>
+        </div>
+        <div>
+          <strong id="brandName">Espace artisan</strong>
+          <span id="brandMetier">Artisan</span>
+        </div>
+      </div>
+      <nav class="nav-side">
+        <a href="index.html">Tableau de bord</a>
+        <a href="paiements.html">Paiements</a>
+      </nav>
+      <div class="side-foot">
+        <a id="linkWidget" href="../widget/index.html">Voir le widget</a>
+        <a href="index.html">← Retour au tableau de bord</a>
+        <button type="button" id="logout">Se déconnecter</button>
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="top">
+        <h1>Importer mes clients</h1>
+      </header>
+
+      <div class="content ic-page">
+        <p class="error" id="pageError" hidden></p>
+
+        <!-- Étape 1 : le fichier -->
+        <section class="panel">
+          <h2>1. Votre fichier</h2>
+          <p class="ic-lead">Exportez vos clients depuis votre logiciel actuel, ou votre tableur, au format CSV. Les séparateurs point-virgule, virgule et tabulation sont reconnus, ainsi que les accents des exports Excel français.</p>
+
+          <div class="ic-drop" id="drop">
+            <input type="file" id="file" accept=".csv,.txt,text/csv,text/plain" hidden />
+            <p><strong>Déposez votre fichier ici</strong></p>
+            <p class="ic-drop-sub">ou</p>
+            <button type="button" class="btn btn-gold" id="pick">Choisir un fichier</button>
+            <p class="ic-drop-hint">Rien n’est envoyé tant que vous n’avez pas validé l’aperçu.</p>
+          </div>
+          <p class="ic-file" id="fileInfo" hidden></p>
+        </section>
+
+        <!-- Étape 2 : les colonnes -->
+        <section class="panel" id="mapPanel" hidden>
+          <h2>2. Les colonnes</h2>
+          <p class="ic-lead">Voici ce que j’ai reconnu. Corrigez si une colonne est mal placée.</p>
+          <div class="ic-map" id="mapFields"></div>
+        </section>
+
+        <!-- Étape 3 : l'aperçu -->
+        <section class="panel" id="previewPanel" hidden>
+          <h2>3. Aperçu</h2>
+          <div class="ic-stats" id="stats"></div>
+
+          <details class="ic-skipped" id="skippedBox" hidden>
+            <summary><span id="skippedCount"></span></summary>
+            <ul id="skippedList"></ul>
+          </details>
+
+          <label class="ic-check" for="skipDup">
+            <input id="skipDup" type="checkbox" checked />
+            <span>Ignorer les doublons (même téléphone ou même adresse électronique)</span>
+          </label>
+
+          <div class="ic-status">
+            <label class="lab" for="statusPick">Enregistrer ces clients comme</label>
+            <select id="statusPick">
+              <option value="gagne" selected>Gagné — clients que j’ai déjà servis</option>
+              <option value="nouveau">Nouveau — prospects à rappeler</option>
+              <option value="archive">Archivé — hors du tableau de bord</option>
+            </select>
+          </div>
+
+          <div class="ic-table-wrap">
+            <table class="ic-table">
+              <thead>
+                <tr><th>Nom</th><th>Téléphone</th><th>Adresse électronique</th><th>Lieu</th><th>État</th></tr>
+              </thead>
+              <tbody id="previewRows"></tbody>
+            </table>
+          </div>
+          <p class="ic-more" id="previewMore" hidden></p>
+
+          <p class="error" id="importError" hidden></p>
+          <p class="ok-msg" id="importOk" hidden></p>
+
+          <div class="ic-actions">
+            <button type="button" class="btn btn-gold" id="importBtn">Importer</button>
+            <button type="button" class="btn btn-ghost" id="cancelBtn">Annuler</button>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="../shared/supabase-config.js"></script>
+  <script src="../shared/store.js"></script>
+  <script src="../shared/csv-clients.js"></script>
+  <script src="import-clients.js"></script>
+</body>
+</html>
