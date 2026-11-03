@@ -1,0 +1,87 @@
+/* ---------------------------------------------------------------------------
+   Espace artisan sur téléphone : ce que la refonte esthétique ne traite pas.
+
+   refonte.css s'occupe déjà de la mise en page sur petit écran — barre du haut
+   compacte, onglets qui défilent, compteurs en rangée. Ce fichier-ci ne revient
+   pas dessus. Il traite trois choses qui relèvent de l'usage, pas de l'aspect :
+
+   1. les zones tactiles trop petites pour un pouce ;
+   2. le zoom automatique de Safari à la saisie ;
+   3. l'encoche et la barre d'accueil des téléphones récents.
+
+   Chargé après refonte.css, donc en dernier.
+--------------------------------------------------------------------------- */
+
+/* --- 1. Les zones tactiles -------------------------------------------------
+   Sous 44 px, une cible se rate souvent au pouce — et un artisan consulte son
+   téléphone debout, parfois avec des gants. On agrandit la zone sensible, pas
+   le dessin, et seulement sur les appareils tactiles : rien ne change à la
+   souris. */
+@media (hover: none) and (pointer: coarse) {
+  .nav-side a,
+  .side-foot a,
+  .side-foot button,
+  .filter,
+  .btn,
+  .list-tools button,
+  .bulk-tools button,
+  .bulk-tools select {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  select,
+  input[type="text"], input[type="email"], input[type="tel"],
+  input[type="number"], input[type="date"], input[type="search"] {
+    min-height: 44px;
+  }
+
+  /* Les cases à cocher : c'est le libellé qui sert de cible, pas la case.
+     Un pseudo-élément posé sur un input n'est pas rendu par tous les
+     navigateurs ; agrandir le libellé, si. */
+  input[type="checkbox"], input[type="radio"] {
+    width: 22px; height: 22px;
+    flex-shrink: 0;
+  }
+  label:has(> input[type="checkbox"]),
+  label:has(> input[type="radio"]) {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+  /* Repli pour les navigateurs sans :has() — les libellés connus du site. */
+  .bulk-select, .tarif-check {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* Une ligne de liste entière devient cliquable, pas seulement son titre. */
+  .list a, .doc-row a, .row a { min-height: 44px; display: flex; align-items: center; }
+}
+
+/* --- 2. Le zoom de Safari --------------------------------------------------
+   iOS agrandit la page dès qu'un champ de moins de 16 px reçoit le curseur, et
+   l'artisan doit ensuite faire glisser son écran pour retrouver le formulaire.
+   16 px exactement suffit à l'en empêcher. */
+@media (max-width: 900px) {
+  input, select, textarea { font-size: 16px; }
+}
+
+/* --- 3. Encoche et barre d'accueil ----------------------------------------- */
+@media (max-width: 900px) {
+  .content { padding-bottom: calc(32px + env(safe-area-inset-bottom)); }
+  .side { padding-top: calc(12px + env(safe-area-inset-top)); }
+}
+
+/* Un écran très étroit (iPhone SE, vieux Android) garde des marges utiles.
+   La barre du haut garde ses 16 px : refonte.css y fait déborder les onglets
+   d'exactement -16 px pour qu'ils défilent bord à bord, et réduire sa marge
+   décalerait la page de quelques pixels. */
+@media (max-width: 380px) {
+  .top, .content { padding-left: 14px; padding-right: 14px; }
+}
