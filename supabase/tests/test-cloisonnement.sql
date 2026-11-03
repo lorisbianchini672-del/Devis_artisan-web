@@ -35,7 +35,7 @@ insert into dv_ai_flags (estimate_id, kind, message) select id, 'alerte', 'drape
 insert into dv_photo_requests (lead_id, note) select id, 'Merci d envoyer une photo' from dv_leads where public_id='dv_lead_alice';
 insert into dv_photo_request_items (request_id, label) select id, 'Tableau' from dv_photo_requests;
 
-insert into storage.buckets (id, name) values ('chantier-photos', 'chantier-photos');
+insert into storage.buckets (id, name) values ('chantier-photos', 'chantier-photos') on conflict (id) do nothing;
 insert into storage.objects (bucket_id, name) values ('chantier-photos', 'dv_lead_alice/photo1.jpg');
 
 -- ---------------------------------------------------------------
