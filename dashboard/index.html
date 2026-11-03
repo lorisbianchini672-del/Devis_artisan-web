@@ -9,7 +9,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link id="dashCss" rel="stylesheet" href="../shared/theme.css" />
   <link id="dashPageCss" rel="stylesheet" href="dashboard.css" />
-  <link rel="stylesheet" href="mobile.css" />
   <script>
     (function () {
       var path = location.pathname;
@@ -21,6 +20,8 @@
       document.documentElement.dataset.dashBase = base;
     })();
   </script>
+  <!-- Chargé en dernier : les ajustements téléphone priment. -->
+  <link rel="stylesheet" href="mobile.css" />
 </head>
 <body class="dash">
   <div class="gate" id="gate" aria-modal="true" role="dialog" aria-labelledby="gateTitle">
