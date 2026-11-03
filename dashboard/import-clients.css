@@ -101,3 +101,13 @@
   .ic-table td:first-child { font-weight: 600; font-size: 1rem; margin-bottom: 4px; }
   .ic-table .ic-state { margin-top: 6px; font-weight: 600; }
 }
+
+/* La barre du haut, passée en ligne sur téléphone, impose sinon une colonne
+   plus large que l'écran : dans une grille, un élément refuse par défaut de
+   rétrécir sous la largeur de son contenu. Quelques pixels de décalage et un
+   glissement latéral parasite à chaque défilement. */
+@media (max-width: 900px) {
+  .app, .app > *, .side, .main, .top, .content { min-width: 0; }
+  .nav-side, .side-brand { min-width: 0; }
+  .side-brand strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
