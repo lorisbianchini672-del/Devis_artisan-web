@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Planning</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <link rel="stylesheet" href="dashboard.css" />
+  <link rel="stylesheet" href="planning.css" />
+</head>
+<body class="dash">
+  <div class="app">
+    <aside class="side">
+      <div class="side-brand">
+        <div class="bolt" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h7l-1 8 10-14h-7l0-6z"/></svg>
+        </div>
+        <div>
+          <strong id="brandName">Espace artisan</strong>
+          <span id="brandMetier">Artisan</span>
+        </div>
+      </div>
+      <nav class="nav-side">
+        <a href="index.html">Tableau de bord</a>
+        <a class="is-on" href="planning.html">Planning</a>
+        <a href="paiements.html">Paiements</a>
+      </nav>
+      <div class="side-foot">
+        <a id="linkWidget" href="../widget/index.html">Voir le widget</a>
+        <a href="index.html">← Retour au tableau de bord</a>
+        <a href="equipe.html">Mon équipe</a>
+        <button type="button" id="logout">Se déconnecter</button>
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="top">
+        <h1>Planning</h1>
+        <button type="button" class="btn btn-gold" id="addBtn">+ Ajouter</button>
+      </header>
+
+      <div class="content pl-page">
+        <p class="error" id="pageError" hidden></p>
+        <p class="pl-note" id="pageNote" hidden></p>
+
+        <section class="panel pl-panel">
+          <div class="pl-bar">
+            <div class="pl-nav">
+              <button type="button" id="prevWeek" aria-label="Semaine précédente">‹</button>
+              <button type="button" id="today">Cette semaine</button>
+              <button type="button" id="nextWeek" aria-label="Semaine suivante">›</button>
+            </div>
+            <h2 class="pl-range" id="weekLabel">Semaine</h2>
+            <div class="pl-legend">
+              <span class="pl-dot pl-k-rdv"></span> Rendez-vous
+              <span class="pl-dot pl-k-chantier"></span> Chantier
+              <span class="pl-dot pl-k-autre"></span> Autre
+            </div>
+          </div>
+
+          <div class="pl-week" id="week"></div>
+          <p class="empty" id="weekEmpty" hidden>Rien de prévu cette semaine.</p>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fiche d'un événement -->
+  <div class="pl-modal" id="modal" hidden>
+    <div class="pl-modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <h2 id="modalTitle">Nouvel événement</h2>
+
+      <div class="pl-form">
+        <div class="pl-f-full">
+          <label class="lab" for="fTitle">Intitulé</label>
+          <input id="fTitle" type="text" maxlength="140" placeholder="Visite chez Mme Martin" />
+        </div>
+
+        <div>
+          <label class="lab" for="fKind">Type</label>
+          <select id="fKind"></select>
+        </div>
+        <div>
+          <label class="lab" for="fStatus">État</label>
+          <select id="fStatus"></select>
+        </div>
+
+        <div>
+          <label class="lab" for="fStart">Début</label>
+          <input id="fStart" type="datetime-local" />
+        </div>
+        <div>
+          <label class="lab" for="fEnd">Fin</label>
+          <input id="fEnd" type="datetime-local" />
+        </div>
+
+        <div class="pl-f-full">
+          <label class="pl-check" for="fAllDay">
+            <input id="fAllDay" type="checkbox" />
+            <span>Journée entière</span>
+          </label>
+        </div>
+
+        <div>
+          <label class="lab" for="fLead">Client</label>
+          <select id="fLead"><option value="">— aucun —</option></select>
+        </div>
+        <div>
+          <label class="lab" for="fMember">Qui s’en occupe</label>
+          <select id="fMember"><option value="">— personne —</option></select>
+        </div>
+
+        <div class="pl-f-full">
+          <label class="lab" for="fLocation">Adresse</label>
+          <input id="fLocation" type="text" maxlength="200" placeholder="12 rue Victor Hugo, 69100 Villeurbanne" />
+        </div>
+
+        <div class="pl-f-full">
+          <label class="lab" for="fNotes">Notes</label>
+          <textarea id="fNotes" rows="3" maxlength="600" placeholder="Prévoir l’échelle et le testeur."></textarea>
+        </div>
+      </div>
+
+      <p class="error" id="formError" hidden></p>
+
+      <div class="pl-modal-actions">
+        <button type="button" class="btn btn-gold" id="saveBtn">Enregistrer</button>
+        <button type="button" class="btn btn-ghost" id="cancelBtn">Annuler</button>
+        <button type="button" class="btn btn-ghost pl-del" id="deleteBtn" hidden>Supprimer</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="../shared/supabase-config.js"></script>
+  <script src="../shared/store.js"></script>
+  <script src="../shared/planning.js"></script>
+  <script src="planning.js"></script>
+</body>
+</html>
