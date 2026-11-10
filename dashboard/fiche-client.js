@@ -458,6 +458,12 @@
       const ok = store.consentPhotos ? await store.consentPhotos(item.id) : false;
       document.getElementById("consentPhotos").checked = Boolean(ok);
     } catch (e) { /* colonne absente : la case reste décochée */ }
+
+    try {
+      const auto = store.suiviAuto ? await store.suiviAuto() : false;
+      const box = document.getElementById("suiviAuto");
+      if (box) box.checked = Boolean(auto);
+    } catch (e) { /* colonne absente : la case reste décochée */ }
   }
 
   function wireSuivi() {
@@ -478,26 +484,74 @@
       }
     });
 
-    const btnAfter = document.getElementById("btnAfter");
-    const fileAfter = document.getElementById("afterInput");
-    btnAfter.addEventListener("click", () => fileAfter.click());
-    fileAfter.addEventListener("change", async () => {
-      const files = Array.from(fileAfter.files || []);
-      if (!files.length) return;
-      btnAfter.disabled = true;
-      suiviMsg("afterMsg", "Envoi de " + files.length + " photo(s)…", null);
-      try {
-        await store.appendPhotos(item, files.map((f) => ({ file: f, name: f.name, mime: f.type, size: f.size })), {
-          phase: "apres",
-        });
-        suiviMsg("afterMsg", files.length + " photo(s) ajoutée(s). Le client les voit sur sa page de suivi.", "ok");
-        fileAfter.value = "";
-      } catch (err) {
-        suiviMsg("afterMsg", err.message || "Envoi impossible.", "err");
-      } finally {
-        btnAfter.disabled = false;
-      }
-    });
+    function wirePhotos(btnId, inputId, phase, libelle) {
+      const btn = document.getElementById(btnId);
+      const input = document.getElementById(inputId);
+      if (!btn || !input) return;
+      btn.addEventListener("click", () => input.click());
+      input.addEventListener("change", async () => {
+        const files = Array.from(input.files || []);
+        if (!files.length) return;
+        btn.disabled = true;
+        suiviMsg("afterMsg", "Envoi de " + files.length + " photo(s)…", null);
+        try {
+          await store.appendPhotos(
+            item,
+            files.map((f) => ({ file: f, name: f.name, mime: f.type, size: f.size })),
+            { phase }
+          );
+          suiviMsg("afterMsg", files.length + " photo(s) " + libelle + " ajoutée(s). Le client les voit sur sa page de suivi.", "ok");
+          input.value = "";
+        } catch (err) {
+          suiviMsg("afterMsg", err.message || "Envoi impossible.", "err");
+        } finally {
+          btn.disabled = false;
+        }
+      });
+    }
+    wirePhotos("btnDuring", "duringInput", "pendant", "d’avancement");
+    wirePhotos("btnAfter", "afterInput", "apres", "de fin");
+
+    // Réglage de l'atelier : prévenir ou non les clients.
+    const auto = document.getElementById("suiviAuto");
+    if (auto) {
+      auto.addEventListener("change", async () => {
+        auto.disabled = true;
+        try {
+          await store.setSuiviAuto(auto.checked);
+          suiviMsg("autoMsg", auto.checked
+            ? "Vos clients seront prévenus aux étapes clés."
+            : "Plus aucun message automatique ne partira.", "ok");
+        } catch (err) {
+          auto.checked = !auto.checked;
+          suiviMsg("autoMsg", err.message || "Enregistrement impossible.", "err");
+        } finally {
+          auto.disabled = false;
+        }
+      });
+    }
+
+    const preview = document.getElementById("btnPreview");
+    if (preview) {
+      preview.addEventListener("click", async () => {
+        preview.disabled = true;
+        suiviMsg("autoMsg", "Vérification…", null);
+        try {
+          const res = await store.previewSuiviMessages();
+          const n = (res && res.detail ? res.detail.length : 0);
+          if (!n) {
+            suiviMsg("autoMsg", "Rien à envoyer aujourd’hui.", null);
+          } else {
+            const lignes = res.detail.map((d) => "• " + d.subject).join("  ");
+            suiviMsg("autoMsg", n + " message(s) partiraient : " + lignes, "ok");
+          }
+        } catch (err) {
+          suiviMsg("autoMsg", err.message || "Vérification impossible.", "err");
+        } finally {
+          preview.disabled = false;
+        }
+      });
+    }
 
     const consent = document.getElementById("consentPhotos");
     consent.addEventListener("change", async () => {

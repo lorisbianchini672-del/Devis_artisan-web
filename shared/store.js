@@ -2772,6 +2772,57 @@
       return true;
     },
 
+    /** Réglage de l'atelier : prévenir ou non les clients aux étapes clés. */
+    async suiviAuto() {
+      await Store.ready();
+      if (Store.backend !== "supabase" || !currentArtisan || currentArtisan.dbId == null) return false;
+      const res = await client
+        .from("dv_artisans")
+        .select("suivi_auto")
+        .eq("id", currentArtisan.dbId)
+        .maybeSingle();
+      if (res.error) return false;
+      return Boolean(res.data && res.data.suivi_auto);
+    },
+
+    async setSuiviAuto(actif) {
+      await Store.ready();
+      if (Store.backend !== "supabase" || !currentArtisan || currentArtisan.dbId == null) {
+        throw new Error("Disponible uniquement avec le compte cloud de l’atelier.");
+      }
+      const res = await client
+        .from("dv_artisans")
+        .update({ suivi_auto: Boolean(actif) })
+        .eq("id", currentArtisan.dbId);
+      if (res.error) {
+        if (/suivi_auto|column/i.test(res.error.message || "")) {
+          throw new Error(
+            "Les messages automatiques ne sont pas encore en base. Exécutez la migration 20261110110000_suivi_messages.sql."
+          );
+        }
+        throw new Error(res.error.message);
+      }
+      return true;
+    },
+
+    /** Ce qui partirait aujourd'hui, sans rien envoyer. */
+    async previewSuiviMessages() {
+      await Store.ready();
+      if (Store.backend !== "supabase") {
+        throw new Error("Disponible uniquement avec le compte cloud de l’atelier.");
+      }
+      const { data, error } = await client.functions.invoke("suivi-notify", {
+        body: { action: "preview" },
+      });
+      if (data && data.ok === false) throw new Error(data.error || "Vérification impossible.");
+      if (error) {
+        throw new Error(
+          "La fonction suivi-notify n’est pas déployée, ou ne répond pas."
+        );
+      }
+      return data || {};
+    },
+
     async consentPhotos(publicId) {
       await Store.ready();
       if (Store.backend !== "supabase") return false;

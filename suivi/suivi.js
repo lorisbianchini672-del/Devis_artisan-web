@@ -100,6 +100,23 @@
     return true;
   }
 
+  function renderProgress(urls) {
+    if (!urls.length) return;
+    var row = el("progressRow");
+    row.textContent = "";
+    urls.forEach(function (u, i) {
+      var img = document.createElement("img");
+      img.src = u;
+      img.loading = "lazy";
+      img.alt = "Avancement du chantier, photo " + (i + 1);
+      row.appendChild(img);
+    });
+    el("progressHint").textContent = urls.length > 1
+      ? urls.length + " photos — faites défiler."
+      : "";
+    show(el("progress"), true);
+  }
+
   function renderShots(urls) {
     if (!urls.length) return;
     var row = el("shotsRow");
@@ -202,7 +219,10 @@
 
     var photos = data.photos || { avant: [], apres: [] };
     var paire = setupBeforeAfter(photos.avant || [], photos.apres || []);
-    if (!paire) renderShots(photos.avant || []);
+    renderProgress(photos.pendant || []);
+    // Les photos de la demande ne s'affichent que tant qu'il n'y a rien d'autre
+    // à montrer : une fois le chantier lancé, l'avancement les remplace.
+    if (!paire && !(photos.pendant || []).length) renderShots(photos.avant || []);
 
     renderContact(data.artisan);
 

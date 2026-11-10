@@ -950,7 +950,10 @@
       border: 1px solid var(--line); border-radius: 10px;
       background: var(--paper); color: var(--ink); font: inherit; font-size: 0.88rem;
     }
-    .sc-after { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line); }
+    .sc-after, .sc-auto { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line); }
+    .sc-auto h3 { font-size: 1rem; margin-bottom: 4px; }
+    .sc-auto .btn { margin-top: 12px; }
+    .sc-photo-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
     .sc-after h3 { font-size: 1rem; margin-bottom: 4px; }
     .sc-after .btn { margin-top: 10px; }
     .sc-consent {
@@ -1075,11 +1078,26 @@
       <p class="sc-msg" id="suiviMsg" hidden></p>
 
       <div class="sc-after">
-        <h3>Photos de fin de chantier</h3>
-        <p class="card-lead">Reprenez les mêmes cadrages que les photos de la demande : l’outil en fait un avant/après.</p>
+        <h3>Photos du chantier</h3>
+        <p class="card-lead">Pendant les travaux, elles donnent au client une raison de revenir sur sa page. À la fin, reprenez les mêmes cadrages que les photos de la demande : l’outil en fait un avant/après.</p>
+        <input id="duringInput" type="file" accept="image/*" multiple hidden />
         <input id="afterInput" type="file" accept="image/*" multiple hidden />
-        <button type="button" class="btn btn-navy" id="btnAfter">Ajouter les photos « après »</button>
+        <div class="sc-photo-btns">
+          <button type="button" class="btn btn-ghost" id="btnDuring">Photos d’avancement</button>
+          <button type="button" class="btn btn-navy" id="btnAfter">Photos « après »</button>
+        </div>
         <p class="sc-msg" id="afterMsg" hidden></p>
+      </div>
+
+      <div class="sc-auto">
+        <h3>Messages automatiques</h3>
+        <p class="card-lead">Réglage de l’atelier, valable pour tous vos clients. Un seul message par jour et par client, jamais deux fois le même.</p>
+        <label class="sc-consent" for="suiviAuto">
+          <input id="suiviAuto" type="checkbox" />
+          <span>Prévenir mes clients aux étapes clés : devis annoncé, devis prêt, relances avant signature, démarrage du chantier, photos d’avancement, fin de chantier.</span>
+        </label>
+        <button type="button" class="btn btn-ghost" id="btnPreview">Voir ce qui partirait aujourd’hui</button>
+        <p class="sc-msg" id="autoMsg" hidden></p>
       </div>
 
       <label class="sc-consent" for="consentPhotos">

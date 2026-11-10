@@ -147,7 +147,9 @@ Deno.serve(async (req) => {
   const signe = lead.status === "gagne" || quotes.some((q) => q.status === "accepte");
   const apres = photos.filter((p) => p.phase === "apres");
   const avant = photos.filter((p) => p.phase === "avant");
+  const pendant = photos.filter((p) => p.phase === "pendant");
   const termine = apres.length > 0 || (chantier != null && new Date(chantier.ends_at) < now);
+  const enCours = !termine && pendant.length > 0;
 
   // ---- Le parcours ---------------------------------------------------------
   const steps: Step[] = [];
@@ -221,10 +223,10 @@ Deno.serve(async (req) => {
   } else if (signe) {
     steps.push({
       key: "chantier",
-      label: termine ? "Chantier terminé" : "Chantier à planifier",
+      label: termine ? "Chantier terminé" : enCours ? "Chantier en cours" : "Chantier à planifier",
       state: termine ? "fait" : "en_cours",
       date: null,
-      detail: termine ? "" : "Votre artisan vous propose une date.",
+      detail: termine ? "" : enCours ? "" : "Votre artisan vous propose une date.",
     });
   }
 
@@ -244,6 +246,7 @@ Deno.serve(async (req) => {
     steps,
     photos: {
       avant: await signed(admin, avant.map((p) => p.storage_path)),
+      pendant: await signed(admin, pendant.map((p) => p.storage_path)),
       apres: await signed(admin, apres.map((p) => p.storage_path)),
     },
     termine,
