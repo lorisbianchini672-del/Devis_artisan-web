@@ -419,6 +419,101 @@
     renderPhotos();
     renderEstimate();
     renderTimeline();
+    renderSuivi();
+  }
+
+  // ----------------------------------------------------------- suivi client -
+  function suiviMsg(id, texte, genre) {
+    const node = document.getElementById(id);
+    if (!node) return;
+    if (!texte) { node.hidden = true; node.textContent = ""; return; }
+    node.textContent = texte;
+    node.className = "sc-msg" + (genre ? " is-" + genre : "");
+    node.hidden = false;
+  }
+
+  async function renderSuivi() {
+    const input = document.getElementById("suiviUrl");
+    if (!input) return;
+    let token = null;
+    try {
+      token = store.suiviToken ? await store.suiviToken(item.id) : null;
+    } catch (err) {
+      suiviMsg("suiviMsg", err.message, "err");
+    }
+    if (!token) {
+      input.value = "";
+      input.placeholder = "Disponible avec le compte cloud, une fois la migration passée.";
+      document.getElementById("btnCopySuivi").disabled = true;
+      document.getElementById("btnOpenSuivi").removeAttribute("href");
+      return;
+    }
+    const url = new URL("../suivi/index.html", window.location.href);
+    url.searchParams.set("t", token);
+    input.value = url.toString();
+    document.getElementById("btnOpenSuivi").href = url.toString();
+    document.getElementById("btnCopySuivi").disabled = false;
+
+    try {
+      const ok = store.consentPhotos ? await store.consentPhotos(item.id) : false;
+      document.getElementById("consentPhotos").checked = Boolean(ok);
+    } catch (e) { /* colonne absente : la case reste décochée */ }
+  }
+
+  function wireSuivi() {
+    const copy = document.getElementById("btnCopySuivi");
+    if (!copy) return;
+    copy.addEventListener("click", async () => {
+      const value = document.getElementById("suiviUrl").value;
+      if (!value) return;
+      try {
+        await navigator.clipboard.writeText(value);
+        suiviMsg("suiviMsg", "Lien copié. Envoyez-le par message à votre client.", "ok");
+      } catch (e) {
+        // Presse-papiers refusé : on sélectionne, le client copie à la main.
+        const input = document.getElementById("suiviUrl");
+        input.focus();
+        input.select();
+        suiviMsg("suiviMsg", "Copie automatique refusée par le navigateur : le lien est sélectionné, faites Ctrl+C.", null);
+      }
+    });
+
+    const btnAfter = document.getElementById("btnAfter");
+    const fileAfter = document.getElementById("afterInput");
+    btnAfter.addEventListener("click", () => fileAfter.click());
+    fileAfter.addEventListener("change", async () => {
+      const files = Array.from(fileAfter.files || []);
+      if (!files.length) return;
+      btnAfter.disabled = true;
+      suiviMsg("afterMsg", "Envoi de " + files.length + " photo(s)…", null);
+      try {
+        await store.appendPhotos(item, files.map((f) => ({ file: f, name: f.name, mime: f.type, size: f.size })), {
+          phase: "apres",
+        });
+        suiviMsg("afterMsg", files.length + " photo(s) ajoutée(s). Le client les voit sur sa page de suivi.", "ok");
+        fileAfter.value = "";
+      } catch (err) {
+        suiviMsg("afterMsg", err.message || "Envoi impossible.", "err");
+      } finally {
+        btnAfter.disabled = false;
+      }
+    });
+
+    const consent = document.getElementById("consentPhotos");
+    consent.addEventListener("change", async () => {
+      consent.disabled = true;
+      try {
+        await store.setConsentPhotos(item.id, consent.checked);
+        suiviMsg("consentMsg", consent.checked
+          ? "Ce chantier peut apparaître sur votre page publique."
+          : "Ce chantier ne sera pas montré.", "ok");
+      } catch (err) {
+        consent.checked = !consent.checked;
+        suiviMsg("consentMsg", err.message || "Enregistrement impossible.", "err");
+      } finally {
+        consent.disabled = false;
+      }
+    });
   }
 
   function showMissing() {
@@ -947,6 +1042,7 @@
     return;
   }
   await store.hydratePhotos(item);
+  wireSuivi();
   render(item);
   showFiche();
 

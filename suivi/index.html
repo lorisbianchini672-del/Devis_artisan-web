@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Suivi de votre projet</title>
+  <meta name="description" content="Suivez l’avancement de votre demande de devis et de votre chantier." />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <link rel="stylesheet" href="suivi.css" />
+</head>
+<body>
+  <div class="sv-wrap">
+
+    <!-- Chargement -->
+    <div class="sv-state" id="loading">
+      <div class="sv-spin" aria-hidden="true"></div>
+      <p>Nous retrouvons votre dossier…</p>
+    </div>
+
+    <!-- Lien invalide -->
+    <div class="sv-state" id="failed" hidden>
+      <h1 id="failTitle">Lien introuvable</h1>
+      <p id="failText">Ce lien de suivi n’est plus valable. Demandez-en un nouveau à votre artisan.</p>
+    </div>
+
+    <!-- Le suivi -->
+    <main id="view" hidden>
+      <header class="sv-head">
+        <p class="sv-by" id="artisanLine"></p>
+        <h1 id="hello">Votre projet</h1>
+        <p class="sv-sub" id="subline"></p>
+      </header>
+
+      <!-- Avant / après : la pièce maîtresse quand le chantier est fini -->
+      <section class="sv-ba" id="beforeAfter" hidden>
+        <h2>Avant / après</h2>
+        <div class="sv-ba-box" id="baBox">
+          <img class="sv-ba-img sv-ba-after" id="imgAfter" alt="Le chantier une fois terminé" />
+          <div class="sv-ba-clip" id="clip">
+            <img class="sv-ba-img" id="imgBefore" alt="Le chantier avant les travaux" />
+          </div>
+          <div class="sv-ba-handle" id="handle" aria-hidden="true"><span></span></div>
+          <input class="sv-ba-range" id="range" type="range" min="0" max="100" value="50"
+                 aria-label="Glisser pour comparer avant et après" />
+          <span class="sv-ba-tag sv-ba-tag-l">Avant</span>
+          <span class="sv-ba-tag sv-ba-tag-r">Après</span>
+        </div>
+        <p class="sv-ba-hint">Faites glisser pour comparer.</p>
+      </section>
+
+      <!-- Le parcours -->
+      <section class="sv-steps">
+        <h2>Où en est votre demande</h2>
+        <ol id="steps"></ol>
+      </section>
+
+      <!-- Les photos du départ, tant qu'il n'y a pas d'après -->
+      <section class="sv-shots" id="shots" hidden>
+        <h2>Vos photos</h2>
+        <div class="sv-shots-row" id="shotsRow"></div>
+      </section>
+
+      <!-- Accord de publication, demandé seulement en fin de chantier -->
+      <section class="sv-consent" id="consent" hidden>
+        <h2>Puis-je montrer ce chantier ?</h2>
+        <p>Votre artisan aimerait présenter ces photos à ses futurs clients. <strong>Ni votre nom ni votre adresse n’apparaîtront</strong> — seulement la ville et le type de travaux.</p>
+        <p class="sv-consent-note">Vous pouvez changer d’avis à tout moment en le lui demandant.</p>
+        <div class="sv-consent-actions">
+          <button type="button" class="sv-btn sv-btn-gold" id="consentYes">J’accepte</button>
+          <button type="button" class="sv-btn sv-btn-ghost" id="consentNo">Non merci</button>
+        </div>
+        <p class="sv-ok" id="consentDone" hidden></p>
+      </section>
+
+      <!-- Joindre l'artisan -->
+      <section class="sv-contact" id="contact">
+        <h2>Une question ?</h2>
+        <p id="contactLead">Votre artisan répond directement.</p>
+        <div class="sv-contact-actions">
+          <a class="sv-btn sv-btn-gold" id="callBtn" hidden>Appeler</a>
+          <a class="sv-btn sv-btn-ghost" id="mailBtn" hidden>Écrire</a>
+        </div>
+      </section>
+
+      <footer class="sv-foot">
+        <p>Page privée, accessible uniquement avec votre lien.</p>
+      </footer>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="../shared/supabase-config.js"></script>
+  <script src="suivi.js"></script>
+</body>
+</html>

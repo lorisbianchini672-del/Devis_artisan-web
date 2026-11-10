@@ -1013,6 +1013,8 @@
     if (!photos || !photos.length) return;
     const prefix = (opts && opts.prefix) || "";
     const orderBase = Number(opts && opts.orderBase) || 1;
+    // « avant » (photos de la demande) ou « apres » (fin de chantier).
+    const phase = (opts && opts.phase) || null;
     const failures = [];
     for (let i = 0; i < photos.length; i++) {
       const photo = photos[i];
@@ -1047,9 +1049,15 @@
         size_bytes: blob.size,
         storage_path: path,
       };
+      if (phase) row.phase = phase;
       let inserted = await client.from("dv_photos").insert(row);
       if (inserted.error && /kind/i.test(inserted.error.message || "")) {
         delete row.kind;
+        inserted = await client.from("dv_photos").insert(row);
+      }
+      // La colonne phase n'existe qu'après la migration du suivi client.
+      if (inserted.error && /phase/i.test(inserted.error.message || "")) {
+        delete row.phase;
         inserted = await client.from("dv_photos").insert(row);
       }
       if (inserted.error) {
@@ -2693,7 +2701,7 @@
       throwIf(removed.error, "Impossible de retirer ce devis.");
     },
 
-    async appendPhotos(leadRef, photos) {
+    async appendPhotos(leadRef, photos, opts) {
       lastError = null;
       await Store.ready();
       const list = Array.isArray(photos) ? photos.filter(Boolean) : [];
@@ -2725,7 +2733,55 @@
       await uploadPhotos({ id: dbId, public_id: publicId }, list, {
         prefix: "r" + Date.now() + "-",
         orderBase: 20,
+        phase: (opts && opts.phase) || null,
       });
+    },
+
+    // ---- Suivi client -----------------------------------------------------
+    /** Jeton du lien de suivi d'une demande, lu à la demande. */
+    async suiviToken(publicId) {
+      await Store.ready();
+      if (Store.backend !== "supabase") return null;
+      const res = await client
+        .from("dv_leads")
+        .select("suivi_token")
+        .eq("public_id", String(publicId))
+        .maybeSingle();
+      if (res.error) {
+        if (/suivi_token|column/i.test(res.error.message || "")) {
+          throw new Error(
+            "Le suivi client n’est pas encore en base. Exécutez la migration 20261110100000_suivi_client.sql."
+          );
+        }
+        throw new Error(res.error.message);
+      }
+      return res.data ? res.data.suivi_token : null;
+    },
+
+    /** Accord du client pour montrer ses photos sur la page publique. */
+    async setConsentPhotos(publicId, accepte) {
+      await Store.ready();
+      if (Store.backend !== "supabase") return false;
+      const res = await client
+        .from("dv_leads")
+        .update({ consent_photos: Boolean(accepte) })
+        .eq("public_id", String(publicId));
+      if (res.error) throw new Error(res.error.message);
+      await fetchLeads();
+      emit();
+      return true;
+    },
+
+    async consentPhotos(publicId) {
+      await Store.ready();
+      if (Store.backend !== "supabase") return false;
+      const res = await client
+        .from("dv_leads")
+        .select("consent_photos")
+        .eq("public_id", String(publicId))
+        .maybeSingle();
+      if (res.error) return false;
+      return Boolean(res.data && res.data.consent_photos);
     },
 
     async refineLead(leadRef, payload) {

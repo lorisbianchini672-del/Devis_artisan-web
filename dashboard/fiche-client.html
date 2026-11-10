@@ -942,6 +942,30 @@
       .lb-prev { left: 4px; }
       .lb-next { right: 4px; }
     }
+
+    /* ---- Suivi client ---- */
+    .sc-link { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 6px; }
+    .sc-link input {
+      flex: 1 1 260px; min-width: 0; padding: 10px 12px;
+      border: 1px solid var(--line); border-radius: 10px;
+      background: var(--paper); color: var(--ink); font: inherit; font-size: 0.88rem;
+    }
+    .sc-after { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line); }
+    .sc-after h3 { font-size: 1rem; margin-bottom: 4px; }
+    .sc-after .btn { margin-top: 10px; }
+    .sc-consent {
+      display: flex; gap: 10px; align-items: flex-start;
+      margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line);
+      font-size: 0.92rem; line-height: 1.5; cursor: pointer;
+    }
+    .sc-consent input { margin-top: 3px; width: 20px; height: 20px; flex-shrink: 0; }
+    .sc-consent em { color: var(--muted); font-style: normal; }
+    .sc-msg { margin-top: 10px; font-size: 0.88rem; color: var(--muted); }
+    .sc-msg.is-ok { color: var(--ok); }
+    .sc-msg.is-err { color: var(--danger); }
+    @media (max-width: 560px) {
+      .sc-link .btn { flex: 1 1 calc(50% - 4px); }
+    }
   </style>
 </head>
 <body>
@@ -1035,6 +1059,34 @@
       <div class="photos" id="photos"></div>
       <p class="empty-block" id="photosEmpty" hidden>Aucune photo ni vidéo pour cette demande.</p>
       <p class="photo-ask-banner" id="photoAskBanner" hidden></p>
+    </section>
+
+    <!-- Suivi client : le lien que le client ouvre, et les photos de fin -->
+    <section class="card" aria-labelledby="bSuivi">
+      <p class="kicker">Suivi client</p>
+      <h2 id="bSuivi">Sa page de suivi</h2>
+      <p class="card-lead">Un lien privé, sans mot de passe, où le client voit où en est son projet. La page se remplit toute seule à partir de ce que vous faites ici.</p>
+
+      <div class="sc-link">
+        <input id="suiviUrl" type="text" readonly aria-label="Lien de suivi du client" />
+        <button type="button" class="btn btn-gold" id="btnCopySuivi">Copier</button>
+        <a class="btn btn-ghost" id="btnOpenSuivi" target="_blank" rel="noopener">Ouvrir</a>
+      </div>
+      <p class="sc-msg" id="suiviMsg" hidden></p>
+
+      <div class="sc-after">
+        <h3>Photos de fin de chantier</h3>
+        <p class="card-lead">Reprenez les mêmes cadrages que les photos de la demande : l’outil en fait un avant/après.</p>
+        <input id="afterInput" type="file" accept="image/*" multiple hidden />
+        <button type="button" class="btn btn-navy" id="btnAfter">Ajouter les photos « après »</button>
+        <p class="sc-msg" id="afterMsg" hidden></p>
+      </div>
+
+      <label class="sc-consent" for="consentPhotos">
+        <input id="consentPhotos" type="checkbox" />
+        <span>Le client m’autorise à montrer ces photos sur ma page publique. <em>Son nom et son adresse n’y figureront jamais.</em></span>
+      </label>
+      <p class="sc-msg" id="consentMsg" hidden></p>
     </section>
 
     <section class="card" aria-labelledby="b3">
